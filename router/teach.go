@@ -9,6 +9,14 @@ import (
 	"api.seaotterms.com/api"
 )
 
+func TeachRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
+	teachGroup := apiGroup.Group("/teach")
+
+	SeriesRouter(teachGroup, dbs)
+	ArticleRouter(teachGroup, dbs)
+	CommentApiRouter(teachGroup, dbs)
+}
+
 func SeriesRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 	apiGroup.Get("/series", func(c *fiber.Ctx) error {
 		return api.QuerySeries(c, dbs[os.Getenv("DATABASE_NAME")])
@@ -23,7 +31,7 @@ func SeriesRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 	})
 }
 
-func ArticleApiRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
+func ArticleRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 	apiGroup.Get("/article", func(c *fiber.Ctx) error {
 		return api.QueryArticle(c, dbs[os.Getenv("DATABASE_NAME")])
 	})

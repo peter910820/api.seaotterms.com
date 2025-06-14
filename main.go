@@ -41,16 +41,15 @@ func main() {
 
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://127.0.0.1:3005,http://localhost:3005",
+		AllowOrigins: os.Getenv("CORS_URL"),
 		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH",
 		AllowHeaders: "Origin,Content-Type,Accept",
 	}))
 
 	// route group
 	apiGroup := app.Group("/api") // main api route group
-	router.SeriesRouter(apiGroup, dbs)
-	router.ArticleApiRouter(apiGroup, dbs)
-	router.CommentApiRouter(apiGroup, dbs)
+	// teach platform route
+	router.TeachRouter(apiGroup, dbs)
 
 	logrus.Fatal(app.Listen(fmt.Sprintf("127.0.0.1:%s", os.Getenv("PRODUCTION_PORT"))))
 }
