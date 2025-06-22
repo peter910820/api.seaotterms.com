@@ -10,21 +10,31 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitDsn(dbName string) (string, *gorm.DB) {
+func InitDsn(choiceDb int) (string, *gorm.DB) {
+	var dbname string
+	switch choiceDb {
+	case 0:
+		dbname = os.Getenv("DATABASE_NAME")
+	case 1:
+		dbname = os.Getenv("DATABASE_NAME2")
+	default:
+		logrus.Fatal("error in init dsn function")
+	}
+
 	dsn := fmt.Sprintf("user=%s password=%s dbname=%s port=%s sslmode=disable",
 		os.Getenv("DATABASE_OWNER"),
 		os.Getenv("DATABASE_PASSWORD"),
-		dbName,
+		dbname,
 		os.Getenv("DATABASE_PORT"))
 
 	// get connect db variable
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		logrus.Fatalf("connect database failed: %v", err)
+		logrus.Fatalf("連接資料庫失敗: %v", err)
 	}
 	sqlDB, err := db.DB()
 	if err != nil {
-		logrus.Fatalf("cannot get sql.DB: %v", err)
+		logrus.Fatalf("無法取得 sql.DB: %v", err)
 	}
 
 	sqlDB.SetMaxOpenConns(30)
@@ -32,5 +42,5 @@ func InitDsn(dbName string) (string, *gorm.DB) {
 	sqlDB.SetConnMaxLifetime(time.Hour)
 	sqlDB.SetConnMaxIdleTime(10 * time.Minute)
 
-	return dbName, db
+	return dbname, db
 }

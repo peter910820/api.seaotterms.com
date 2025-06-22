@@ -35,9 +35,11 @@ func init() {
 
 func main() {
 	// init migration
-	dbName, db := model.InitDsn(os.Getenv("DATABASE_NAME"))
-	dbs[dbName] = db
-	model.Migration(dbName, dbs[dbName])
+	for i := 0; i <= 1; i++ {
+		dbName, db := model.InitDsn(i)
+		dbs[dbName] = db
+		model.Migration(dbName, dbs[dbName])
+	}
 
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
