@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 
 	"api.seaotterms.com/dto"
-	"api.seaotterms.com/model"
+	model "api.seaotterms.com/model/teach"
 )
 
 // query series
