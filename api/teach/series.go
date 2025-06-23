@@ -1,4 +1,4 @@
-package api
+package teach
 
 import (
 	"net/url"

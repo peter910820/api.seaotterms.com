@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 
-	"api.seaotterms.com/api"
+	teachapi "api.seaotterms.com/api/teach"
 )
 
 func TeachRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
@@ -19,25 +19,25 @@ func TeachRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 
 func SeriesRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 	apiGroup.Get("/series", func(c *fiber.Ctx) error {
-		return api.QuerySeries(c, dbs[os.Getenv("DATABASE_NAME")])
+		return teachapi.QuerySeries(c, dbs[os.Getenv("DATABASE_NAME")])
 	})
 
 	apiGroup.Post("/series", func(c *fiber.Ctx) error {
-		return api.CreateSeries(c, dbs[os.Getenv("DATABASE_NAME")])
+		return teachapi.CreateSeries(c, dbs[os.Getenv("DATABASE_NAME")])
 	})
 
 	apiGroup.Patch("/series/:id", func(c *fiber.Ctx) error {
-		return api.ModifySeries(c, dbs[os.Getenv("DATABASE_NAME")])
+		return teachapi.ModifySeries(c, dbs[os.Getenv("DATABASE_NAME")])
 	})
 }
 
 func ArticleRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 	apiGroup.Get("/article", func(c *fiber.Ctx) error {
-		return api.QueryArticle(c, dbs[os.Getenv("DATABASE_NAME")])
+		return teachapi.QueryArticle(c, dbs[os.Getenv("DATABASE_NAME")])
 	})
 
 	apiGroup.Post("/article", func(c *fiber.Ctx) error {
-		return api.CreateArticle(c, dbs[os.Getenv("DATABASE_NAME")])
+		return teachapi.CreateArticle(c, dbs[os.Getenv("DATABASE_NAME")])
 	})
 }
 
