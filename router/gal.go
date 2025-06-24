@@ -6,5 +6,5 @@ import (
 )
 
 func GalRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
-	galGroup := apiGroup.Group("/gal")
+	// galGroup := apiGroup.Group("/gal")
 }
