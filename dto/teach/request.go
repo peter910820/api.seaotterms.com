@@ -2,17 +2,17 @@ package teach
 
 import "github.com/lib/pq"
 
-type SeriesCreateResponse struct {
+type SeriesCreateRequest struct {
 	Title string `gorm:"NOT NULL" json:"title"`
 	Image string `json:"image"`
 }
 
-type SeriesModifyResponse struct {
+type SeriesModifyRequest struct {
 	Title string `gorm:"NOT NULL" json:"title"`
 	Image string `json:"image"`
 }
 
-type ArtilceCreateResponse struct {
+type ArtilceCreateRequest struct {
 	Title    string         `gorm:"NOT NULL" json:"title"`
 	SeriesID uint           `gorm:"NOT NULL" json:"seriesId"`
 	Image    string         `json:"image"`
@@ -20,7 +20,7 @@ type ArtilceCreateResponse struct {
 	Content  string         `gorm:"NOT NULL" json:"content"`
 }
 
-type ArtilceModifyResponse struct {
+type ArtilceModifyRequest struct {
 	Title    string         `gorm:"NOT NULL" json:"title"`
 	SeriesID uint           `gorm:"NOT NULL" json:"seriesId"`
 	Image    string         `json:"image"`

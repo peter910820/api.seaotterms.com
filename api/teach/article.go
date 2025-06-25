@@ -57,7 +57,7 @@ func QueryArticle(c *fiber.Ctx, db *gorm.DB) error {
 }
 
 func CreateArticle(c *fiber.Ctx, db *gorm.DB) error {
-	var clientData dto.ArtilceCreateResponse
+	var clientData dto.ArtilceCreateRequest
 	// load client data
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err.Error())
@@ -121,7 +121,7 @@ func CreateArticle(c *fiber.Ctx, db *gorm.DB) error {
 }
 
 func ModifyArticle(c *fiber.Ctx, db *gorm.DB) error {
-	var clientData dto.ArtilceModifyResponse
+	var clientData dto.ArtilceModifyRequest
 	// load client data
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err.Error())

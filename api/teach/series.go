@@ -53,7 +53,7 @@ func QuerySeries(c *fiber.Ctx, db *gorm.DB) error {
 }
 
 func CreateSeries(c *fiber.Ctx, db *gorm.DB) error {
-	var clientData dto.SeriesCreateResponse
+	var clientData dto.SeriesCreateRequest
 	// load client data
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err.Error())
@@ -84,7 +84,7 @@ func CreateSeries(c *fiber.Ctx, db *gorm.DB) error {
 }
 
 func ModifySeries(c *fiber.Ctx, db *gorm.DB) error {
-	var clientData dto.SeriesModifyResponse
+	var clientData dto.SeriesModifyRequest
 	// load client data
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err.Error())
