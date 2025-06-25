@@ -1,4 +1,4 @@
-package dto
+package teach
 
 import "github.com/lib/pq"
 

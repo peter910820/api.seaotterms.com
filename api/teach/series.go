@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 
-	"api.seaotterms.com/dto"
+	dto "api.seaotterms.com/dto/teach"
 	model "api.seaotterms.com/model/teach"
 )
 

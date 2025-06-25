@@ -20,8 +20,8 @@ import (
 
 type User struct {
 	ID             uint      `gorm:"primaryKey" json:"id"`
-	Name           string    `gorm:"NOT NULL" json:"name"`
-	Email          string    `gorm:"NOT NULL" json:"email"`
+	Email          string    `gorm:"primaryKey" json:"email"`
+	Name           string    `gorm:"primaryKey" json:"name"`
 	Password       string    `gorm:"NOT NULL" json:"-"`
 	ProfilePicture string    `json:"profilePicture"`
 	BannerPicture  string    `json:"bannerPicture"`
