@@ -12,12 +12,12 @@ import (
 func TeachRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 	teachGroup := apiGroup.Group("/teach")
 
-	SeriesRouter(teachGroup, dbs)
-	ArticleRouter(teachGroup, dbs)
-	CommentApiRouter(teachGroup, dbs)
+	seriesRouter(teachGroup, dbs)
+	articleRouter(teachGroup, dbs)
+	commentApiRouter(teachGroup, dbs)
 }
 
-func SeriesRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
+func seriesRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 	apiGroup.Get("/series", func(c *fiber.Ctx) error {
 		return teachapi.QuerySeries(c, dbs[os.Getenv("DATABASE_NAME")])
 	})
@@ -31,7 +31,7 @@ func SeriesRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 	})
 }
 
-func ArticleRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
+func articleRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 	apiGroup.Get("/article", func(c *fiber.Ctx) error {
 		return teachapi.QueryArticle(c, dbs[os.Getenv("DATABASE_NAME")])
 	})
@@ -41,5 +41,5 @@ func ArticleRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 	})
 }
 
-func CommentApiRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
+func commentApiRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 }
