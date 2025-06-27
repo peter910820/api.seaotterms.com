@@ -50,7 +50,8 @@ func main() {
 
 	// route group
 	apiGroup := app.Group("/api") // main api route group
-	// teach platform route
+
+	router.GalRouter(apiGroup, dbs)
 	router.TeachRouter(apiGroup, dbs)
 
 	logrus.Fatal(app.Listen(fmt.Sprintf("127.0.0.1:%s", os.Getenv("PRODUCTION_PORT"))))
