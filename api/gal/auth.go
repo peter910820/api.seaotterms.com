@@ -64,7 +64,7 @@ func Register(c *fiber.Ctx, db *gorm.DB) error {
 			responseData.ErrMsg = "未預期的錯誤，請聯繫管理員"
 			return c.Status(fiber.StatusInternalServerError).JSON(responseData)
 		}
-		err = utils.WriteTmpData("RegisterKey", key, timeNow, db)
+		err = utils.WriteTmpData("RegisterKey", key, timeNow.Add(24*time.Hour), db)
 		if err != nil {
 			logrus.Println("錯誤:", err)
 			responseData.ErrMsg = "未預期的錯誤，請聯繫管理員"
