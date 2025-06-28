@@ -25,7 +25,11 @@ func Migration(dbName string, db *gorm.DB) {
 		db.AutoMigrate(&teachmodel.Comment{})
 	case os.Getenv("DATABASE_NAME2"):
 		// db.AutoMigrate(&galmodel.DownloadArticle{})
+		db.AutoMigrate(&galmodel.User{})
+		db.AutoMigrate(&galmodel.Tag{})
 		db.AutoMigrate(&galmodel.Article{})
+		db.AutoMigrate(&galmodel.Log{})
+		db.AutoMigrate(&galmodel.TmpData{})
 	default:
 		logrus.Fatal("error in migration function")
 	}

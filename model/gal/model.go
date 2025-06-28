@@ -4,8 +4,6 @@ import (
 	"time"
 )
 
-// A00_Galgame
-
 // type DownloadArticle struct {
 // 	ID           uint      `gorm:"primaryKey" json:"id"`
 // 	Image        string    `json:"image"`
@@ -20,8 +18,8 @@ import (
 
 type User struct {
 	ID             uint      `gorm:"primaryKey" json:"id"`
-	Email          string    `gorm:"primaryKey" json:"email"`
-	Name           string    `gorm:"primaryKey" json:"name"`
+	Email          string    `gorm:"unique" json:"email"`
+	UserName       string    `gorm:"unique" json:"userName"`
 	Password       string    `gorm:"NOT NULL" json:"-"`
 	ProfilePicture string    `json:"profilePicture"`
 	BannerPicture  string    `json:"bannerPicture"`
@@ -59,4 +57,12 @@ type Log struct {
 	Message   string    `gorm:"NOT NULL" json:"message"`
 	Severity  uint      `gorm:"NOT NULL; default:0" json:"severity"`
 	CreatedAt time.Time `gorm:"NOT NULL; autoCreateTime" json:"createdAt"`
+}
+
+type TmpData struct {
+	ID           uint      `gorm:"primaryKey" json:"id"`
+	Type         string    `gorm:"NOT NULL" json:"type"`
+	Content      string    `gorm:"NOT NULL" json:"content"`
+	ExpirationAt time.Time `gorm:"NOT NULL" json:"expirationAt"`
+	CreatedAt    time.Time `gorm:"NOT NULL; autoCreateTime" json:"createdAt"`
 }
