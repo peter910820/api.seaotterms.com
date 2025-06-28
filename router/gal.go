@@ -15,7 +15,6 @@ func GalRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 
 	authRouter(galGroup, dbs, dbName)
 	loginRouter(galGroup, dbs, dbName)
-	testRouter(galGroup)
 }
 
 func authRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
@@ -23,7 +22,7 @@ func authRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
 		return galapi.Register(c, dbs[dbName])
 	})
 
-	apiGroup.Get("/register/:register-key", func(c *fiber.Ctx) error {
+	apiGroup.Get("/register/:mail_name/:register_key", func(c *fiber.Ctx) error {
 		return galapi.RegisterKeyCheck(c, dbs[dbName])
 	})
 }
@@ -31,11 +30,5 @@ func authRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
 func loginRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
 	apiGroup.Post("/login", func(c *fiber.Ctx) error {
 		return galapi.Register(c, dbs[dbName])
-	})
-}
-
-func testRouter(apiGroup fiber.Router) {
-	apiGroup.Get("/test-mail-send", func(c *fiber.Ctx) error {
-		return galapi.TestMailSend(c)
 	})
 }

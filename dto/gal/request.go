@@ -5,3 +5,9 @@ type LoginRequest struct {
 	Name     string `json:"name"`
 	Password string `json:"password"`
 }
+
+type RegisterRequest struct {
+	Email    string `json:"email"`
+	UserName string `json:"userName"`
+	Password string `json:"password"`
+}
