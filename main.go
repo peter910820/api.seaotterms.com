@@ -11,7 +11,9 @@ import (
 	"gorm.io/gorm"
 
 	"api.seaotterms.com/model"
-	"api.seaotterms.com/router"
+	blogrouter "api.seaotterms.com/router/blog"
+	galrouter "api.seaotterms.com/router/gal"
+	teachrouter "api.seaotterms.com/router/teach"
 )
 
 var (
@@ -35,7 +37,7 @@ func init() {
 
 func main() {
 	// init migration
-	for i := 0; i <= 1; i++ {
+	for i := 0; i <= 2; i++ {
 		dbName, db := model.InitDsn(i)
 		dbs[dbName] = db
 		model.Migration(dbName, dbs[dbName])
@@ -51,8 +53,9 @@ func main() {
 	// route group
 	apiGroup := app.Group("/api") // main api route group
 
-	router.GalRouter(apiGroup, dbs)
-	router.TeachRouter(apiGroup, dbs)
+	galrouter.GalRouter(apiGroup, dbs)
+	blogrouter.BlogRouter(apiGroup, dbs)
+	teachrouter.TeachRouter(apiGroup, dbs)
 
 	logrus.Fatal(app.Listen(fmt.Sprintf("127.0.0.1:%s", os.Getenv("PRODUCTION_PORT"))))
 }

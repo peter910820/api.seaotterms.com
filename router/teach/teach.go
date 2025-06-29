@@ -1,4 +1,4 @@
-package router
+package teach
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 
-	teachapi "api.seaotterms.com/api/teach"
+	api "api.seaotterms.com/api/teach"
 )
 
 func TeachRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
@@ -20,25 +20,25 @@ func TeachRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 
 func seriesRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
 	apiGroup.Get("/series", func(c *fiber.Ctx) error {
-		return teachapi.QuerySeries(c, dbs[dbName])
+		return api.QuerySeries(c, dbs[dbName])
 	})
 
 	apiGroup.Post("/series", func(c *fiber.Ctx) error {
-		return teachapi.CreateSeries(c, dbs[dbName])
+		return api.CreateSeries(c, dbs[dbName])
 	})
 
 	apiGroup.Patch("/series/:id", func(c *fiber.Ctx) error {
-		return teachapi.ModifySeries(c, dbs[dbName])
+		return api.ModifySeries(c, dbs[dbName])
 	})
 }
 
 func articleRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
 	apiGroup.Get("/article", func(c *fiber.Ctx) error {
-		return teachapi.QueryArticle(c, dbs[dbName])
+		return api.QueryArticle(c, dbs[dbName])
 	})
 
 	apiGroup.Post("/article", func(c *fiber.Ctx) error {
-		return teachapi.CreateArticle(c, dbs[dbName])
+		return api.CreateArticle(c, dbs[dbName])
 	})
 }
 

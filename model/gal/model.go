@@ -18,8 +18,8 @@ import (
 
 type User struct {
 	ID             uint      `gorm:"primaryKey" json:"id"`
-	Email          string    `gorm:"unique" json:"email"`
-	UserName       string    `gorm:"unique" json:"userName"`
+	Email          string    `gorm:"uniqueIndex" json:"email"`
+	UserName       string    `gorm:"uniqueIndex" json:"userName"`
 	Password       string    `gorm:"NOT NULL" json:"-"`
 	ProfilePicture string    `json:"profilePicture"`
 	BannerPicture  string    `json:"bannerPicture"`
@@ -47,7 +47,7 @@ type Article struct {
 
 type Tag struct {
 	ID       uint   `gorm:"primaryKey" json:"id"`
-	Name     string `gorm:"NOT NULL;unique" json:"name"`
+	Name     string `gorm:"NOT NULL;uniqueIndex" json:"name"`
 	IconName string `gorm:"NOT NULL" json:"iconName"`
 }
 
