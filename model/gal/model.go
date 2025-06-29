@@ -47,7 +47,7 @@ type Article struct {
 
 type Tag struct {
 	ID       uint   `gorm:"primaryKey" json:"id"`
-	Name     string `gorm:"NOT NULL" json:"name"`
+	Name     string `gorm:"NOT NULL;unique" json:"name"`
 	IconName string `gorm:"NOT NULL" json:"iconName"`
 }
 

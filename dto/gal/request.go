@@ -11,3 +11,6 @@ type RegisterRequest struct {
 	UserName string `json:"userName"`
 	Password string `json:"password"`
 }
+
+type ArticleCreateRequest struct {
+}
