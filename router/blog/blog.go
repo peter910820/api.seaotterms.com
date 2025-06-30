@@ -14,6 +14,7 @@ func BlogRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB) {
 	dbName := os.Getenv("DATABASE_NAME3")
 
 	articleRouter(blogGroup, dbs, dbName)
+	tagRouter(blogGroup, dbs, dbName)
 }
 
 func articleRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
@@ -28,5 +29,15 @@ func articleRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, dbName string
 
 	apiGroup.Get("/article/:articleID", func(c *fiber.Ctx) error {
 		return api.QuerySingleArticle(c, dbs[dbName])
+	})
+}
+
+func tagRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
+	apiGroup.Get("/tag", func(c *fiber.Ctx) error {
+		return api.QueryTag(c, dbs[dbName])
+	})
+
+	apiGroup.Post("/tag", func(c *fiber.Ctx) error {
+		return api.CreateTag(c, dbs[dbName])
 	})
 }
