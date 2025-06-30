@@ -5,3 +5,8 @@ type ArticleQueryRequest struct {
 	Content string `json:"content"`
 	TagIDs  []uint `json:"tags"`
 }
+
+type TagCreateRequest struct {
+	Name     string `json:"name"`
+	IconName string `json:"iconName"`
+}

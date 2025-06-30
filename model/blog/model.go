@@ -13,8 +13,10 @@ type Article struct {
 }
 
 // all article tags
+//不允許修改Name(PK)
 type Tag struct {
-	ID       uint   `gorm:"primaryKey" json:"id"`
-	Name     string `gorm:"NOT NULL;uniqueIndex" json:"name"`
-	IconName string `gorm:"NOT NULL" json:"iconName"`
+	Name      string    `gorm:"primaryKey" json:"name"`
+	IconName  string    `json:"iconName"`
+	CreatedAt time.Time `gorm:"NOT NULL; autoCreateTime" json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
