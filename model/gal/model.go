@@ -16,6 +16,32 @@ import (
 // 	UpdatedName  string    `json:"updatedName"`
 // }
 
+// galgame brand record schema
+type BrandRecord struct {
+	Brand       string    `gorm:"primaryKey" json:"brand"`          // PK
+	Completed   int       `gorm:"not null" json:"completed"`        // Completed game amount
+	Total       int       `gorm:"not null" json:"total"`            // Total game amount
+	Annotation  string    `gorm:"not null" json:"annotation"`       // Annotation
+	Dissolution bool      `gorm:"default:false" json:"dissolution"` // Dissolution
+	InputTime   time.Time `gorm:"autoCreateTime" json:"inputTime"`  // InputTime
+	InputName   string    `gorm:"not null" json:"inputName"`        // InputName
+	UpdateTime  time.Time `gorm:"autoUpdateTime" json:"updateTime"` // UpdateTime
+	UpdateName  string    `gorm:"not null" json:"updateName"`       // UpdateName
+}
+
+// galgame game record schema
+type GameRecord struct {
+	Name        string    `gorm:"primaryKey" json:"name"`           // PK
+	Brand       string    `gorm:"not null" json:"brand"`            // Brand
+	ReleaseDate time.Time `gorm:"not null" json:"releaseDate"`      // ReleaseDate
+	AllAges     bool      `gorm:"not null" json:"allAges"`          // For all ages
+	EndDate     time.Time `gorm:"not null" json:"endDate"`          // End date of play
+	InputTime   time.Time `gorm:"autoCreateTime" json:"inputTime"`  // InputTime
+	InputName   string    `gorm:"not null" json:"inputName"`        // InputName
+	UpdateTime  time.Time `gorm:"autoUpdateTime" json:"updateTime"` // UpdateTime
+	UpdateName  string    `gorm:"not null" json:"updateName"`       // UpdateName
+}
+
 type User struct {
 	ID             uint      `gorm:"primaryKey" json:"id"`
 	Email          string    `gorm:"uniqueIndex" json:"email"`
@@ -46,9 +72,11 @@ type Article struct {
 }
 
 type Tag struct {
-	ID       uint   `gorm:"primaryKey" json:"id"`
-	Name     string `gorm:"NOT NULL;uniqueIndex" json:"name"`
-	IconName string `gorm:"NOT NULL" json:"iconName"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	Name      string    `gorm:"NOT NULL;uniqueIndex" json:"name"`
+	IconName  string    `gorm:"NOT NULL" json:"iconName"`
+	CreatedAt time.Time `gorm:"NOT NULL; autoCreateTime" json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type Log struct {
