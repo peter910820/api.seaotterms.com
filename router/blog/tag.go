@@ -7,14 +7,14 @@ import (
 	api "api.seaotterms.com/api/blog"
 )
 
-func tagRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
-	tagGroup := apiGroup.Group("/tag")
+func tagRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
+	tagGroup := blogGroup.Group("/tag")
 
 	tagGroup.Get("/", func(c *fiber.Ctx) error {
 		return api.QueryTag(c, dbs[dbName])
 	})
 
-	tagGroup.Get("/:tagName", func(c *fiber.Ctx) error {
+	tagGroup.Get("/:name", func(c *fiber.Ctx) error {
 		return api.QueryArticleForTag(c, dbs[dbName])
 	})
 
