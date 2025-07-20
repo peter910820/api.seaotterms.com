@@ -8,16 +8,14 @@ import (
 )
 
 func articleRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
-	apiGroup.Get("/article", func(c *fiber.Ctx) error {
+	articleGroup := apiGroup.Group("/article")
+
+	articleGroup.Get("/", func(c *fiber.Ctx) error {
 		return api.QueryArticle(c, dbs[dbName])
 	})
 
 	// No middleware has been implemented yet
-	apiGroup.Post("/article", func(c *fiber.Ctx) error {
+	articleGroup.Post("/", func(c *fiber.Ctx) error {
 		return api.CreateArticle(c, dbs[dbName])
-	})
-
-	apiGroup.Get("/article/:articleID", func(c *fiber.Ctx) error {
-		return api.QuerySingleArticle(c, dbs[dbName])
 	})
 }

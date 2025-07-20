@@ -8,11 +8,17 @@ import (
 )
 
 func tagRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
-	apiGroup.Get("/tag", func(c *fiber.Ctx) error {
+	tagGroup := apiGroup.Group("/tag")
+
+	tagGroup.Get("/", func(c *fiber.Ctx) error {
 		return api.QueryTag(c, dbs[dbName])
 	})
 
-	apiGroup.Post("/tag", func(c *fiber.Ctx) error {
+	tagGroup.Get("/:tagName", func(c *fiber.Ctx) error {
+		return api.QueryArticleForTag(c, dbs[dbName])
+	})
+
+	tagGroup.Post("/", func(c *fiber.Ctx) error {
 		return api.CreateTag(c, dbs[dbName])
 	})
 }

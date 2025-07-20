@@ -1,6 +1,9 @@
 package blog
 
 import (
+	"net/url"
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -9,46 +12,8 @@ import (
 	model "api.seaotterms.com/model/blog"
 )
 
-func QueryArticle(c *fiber.Ctx, db *gorm.DB) error {
-	var articleData []model.Article
-
-	result := db.Order("created_at desc").Find(&articleData)
-	if result.Error != nil {
-		logrus.Error(result.Error)
-		// 500
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"msg": result.Error.Error(),
-		})
-	}
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"data": articleData,
-	})
-}
-
-func QuerySingleArticle(c *fiber.Ctx, db *gorm.DB) error {
-	var articleData model.Article
-
-	// find articles
-	result := db.First(&articleData, c.Params("articleID"))
-	if result.Error != nil {
-		// if record not exist
-		if result.Error == gorm.ErrRecordNotFound {
-			logrus.Info(result.Error)
-			return c.SendStatus(fiber.StatusNotFound)
-		} else {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"msg": result.Error.Error(),
-			})
-		}
-	}
-	logrus.Info("查詢單一文章成功")
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"data": articleData,
-	})
-}
-
 func CreateArticle(c *fiber.Ctx, db *gorm.DB) error {
-	var clientData dto.ArticleQueryRequest
+	var clientData dto.ArticleCreateRequest
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -56,17 +21,13 @@ func CreateArticle(c *fiber.Ctx, db *gorm.DB) error {
 		})
 	}
 
-	// get tag data
-	var tags []model.Tag
-	if len(clientData.TagIDs) > 0 {
-		if err := db.Where("id IN ?", clientData.TagIDs).Find(&tags).Error; err != nil {
+	if len(clientData.Tags) > 0 {
+		var count int64
+		db.Model(&model.Tag{}).Where("name IN ?", clientData.Tags).Count(&count)
+		if count != int64(len(clientData.Tags)) {
+			logrus.Error("缺少tags，請先建立tags")
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"msg": err.Error(),
-			})
-		}
-		if len(tags) != len(clientData.TagIDs) {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"msg": "部分標籤不存在",
+				"msg": "缺少tags，請先建立tags",
 			})
 		}
 	}
@@ -74,7 +35,12 @@ func CreateArticle(c *fiber.Ctx, db *gorm.DB) error {
 	data := model.Article{
 		Title:   clientData.Title,
 		Content: clientData.Content,
-		Tags:    tags,
+		Tags:    []model.Tag{},
+	}
+	for _, tag := range clientData.Tags {
+		if !(strings.TrimSpace(tag) == "") {
+			data.Tags = append(data.Tags, model.Tag{Name: tag})
+		}
 	}
 
 	if err := db.Create(&data).Error; err != nil {
@@ -85,5 +51,46 @@ func CreateArticle(c *fiber.Ctx, db *gorm.DB) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"msg": "建立資料成功",
+	})
+}
+
+func QueryArticle(c *fiber.Ctx, db *gorm.DB) error {
+	var articleData []model.Article
+	var err error
+
+	id := c.Query("id")
+	if id != "" {
+		err = db.Preload("Tags").First(&articleData, id).Error
+	} else {
+		err = db.Preload("Tags").Order("created_at desc").Find(&articleData).Error
+	}
+	if err != nil {
+		logrus.Error(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"msg": err.Error(),
+		})
+	}
+	logrus.Info("query articles success")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data": articleData,
+	})
+}
+
+func QueryArticleForTag(c *fiber.Ctx, db *gorm.DB) error {
+	var articles []model.Article
+	// URL decoding
+	name, err := url.QueryUnescape(c.Params("tagName"))
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	err = db.Joins("JOIN article_tags ON article_tags.article_id = articles.id").
+		Joins("JOIN tags ON tags.name = article_tags.tag_name").
+		Where("tags.name = ?", name).
+		Find(&articles).Error
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data": articles,
 	})
 }

@@ -1,9 +1,9 @@
 package blog
 
-type ArticleQueryRequest struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
-	TagIDs  []uint `json:"tags"`
+type ArticleCreateRequest struct {
+	Title   string   `json:"title"`
+	Content string   `json:"content"`
+	Tags    []string `json:"tags"`
 }
 
 type TagCreateRequest struct {
