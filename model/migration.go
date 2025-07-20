@@ -8,8 +8,8 @@ import (
 
 	"gorm.io/gorm"
 
-	// galmodel "api.seaotterms.com/model/gal"
 	blogmodel "api.seaotterms.com/model/blog"
+	galmodel "api.seaotterms.com/model/gal"
 	teachmodel "api.seaotterms.com/model/teach"
 )
 
@@ -26,14 +26,20 @@ func Migration(dbName string, db *gorm.DB) {
 		db.AutoMigrate(&teachmodel.Comment{})
 	case os.Getenv("DATABASE_NAME2"):
 		// db.AutoMigrate(&galmodel.DownloadArticle{})
-		// db.AutoMigrate(&galmodel.User{})
-		// db.AutoMigrate(&galmodel.Tag{})
-		// db.AutoMigrate(&galmodel.Article{})
-		// db.AutoMigrate(&galmodel.Log{})
-		// db.AutoMigrate(&galmodel.TmpData{})
+		db.AutoMigrate(&galmodel.BrandRecord{})
+		db.AutoMigrate(&galmodel.GameRecord{})
+		db.AutoMigrate(&galmodel.User{})
+		db.AutoMigrate(&galmodel.Tag{})
+		db.AutoMigrate(&galmodel.Article{})
+		db.AutoMigrate(&galmodel.Log{})
+		db.AutoMigrate(&galmodel.TmpData{})
 	case os.Getenv("DATABASE_NAME3"):
+		db.AutoMigrate(&blogmodel.User{})
 		db.AutoMigrate(&blogmodel.Tag{})
 		db.AutoMigrate(&blogmodel.Article{})
+		db.AutoMigrate(&blogmodel.Todo{})
+		db.AutoMigrate(&blogmodel.TodoTopic{})
+		db.AutoMigrate(&blogmodel.SystemTodo{})
 	default:
 		logrus.Fatal("error in migration function")
 	}
