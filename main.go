@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -17,6 +19,11 @@ import (
 )
 
 var (
+	// init store(session)
+	blogStore = session.New(session.Config{
+		Expiration: 7 * 24 * time.Hour,
+		// CookieHTTPOnly: true,
+	})
 	// management database connect
 	dbs = make(map[string]*gorm.DB)
 )
@@ -50,11 +57,12 @@ func main() {
 		AllowHeaders: "Origin,Content-Type,Accept",
 	}))
 
-	// route group
+	// api route group
 	apiGroup := app.Group("/api") // main api route group
 
+	// site route group
 	galrouter.GalRouter(apiGroup, dbs)
-	blogrouter.BlogRouter(apiGroup, dbs)
+	blogrouter.BlogRouter(apiGroup, dbs, blogStore)
 	teachrouter.TeachRouter(apiGroup, dbs)
 
 	logrus.Fatal(app.Listen(fmt.Sprintf("127.0.0.1:%s", os.Getenv("PRODUCTION_PORT"))))
