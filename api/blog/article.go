@@ -16,7 +16,6 @@ import (
 func QueryArticle(c *fiber.Ctx, db *gorm.DB) error {
 	var data []model.Article
 	var err error
-	response := dto.CreateDefalutCommonResponse[[]model.Article]()
 
 	id := c.Query("id")
 	if id != "" {
@@ -26,26 +25,29 @@ func QueryArticle(c *fiber.Ctx, db *gorm.DB) error {
 	}
 	if err != nil {
 		logrus.Error(err)
-		response.StatusCode = 500
-		response.ErrMsg = err.Error()
-		return c.Status(fiber.StatusInternalServerError).JSON(response)
+		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[[]model.Article]{
+			StatusCode: 500,
+			ErrMsg:     err.Error(),
+		})
 	}
 	logrus.Info("Article資料查詢成功")
-	response.Data = &data
-	response.InfoMsg = "Article資料查詢成功"
-	return c.Status(fiber.StatusOK).JSON(response)
+	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[[]model.Article]{
+		StatusCode: 200,
+		InfoMsg:    "Article資料查詢成功",
+		Data:       &data,
+	})
 }
 
 // create article data
 func CreateArticle(c *fiber.Ctx, db *gorm.DB) error {
 	var clientData dto.ArticleCreateRequest
-	response := dto.CreateDefalutCommonResponse[model.Article]()
 
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err)
-		response.StatusCode = 500
-		response.ErrMsg = err.Error()
-		return c.Status(fiber.StatusInternalServerError).JSON(response)
+		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
+			StatusCode: 500,
+			ErrMsg:     err.Error(),
+		})
 	}
 
 	if len(clientData.Tags) > 0 {
@@ -53,9 +55,10 @@ func CreateArticle(c *fiber.Ctx, db *gorm.DB) error {
 		db.Model(&model.Tag{}).Where("name IN ?", clientData.Tags).Count(&count)
 		if count != int64(len(clientData.Tags)) {
 			logrus.Error("缺少tags，請先建立tags")
-			response.StatusCode = 500
-			response.ErrMsg = "缺少tags，請先建立tags"
-			return c.Status(fiber.StatusInternalServerError).JSON(response)
+			return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
+				StatusCode: 500,
+				ErrMsg:     "缺少tags，請先建立tags",
+			})
 		}
 	}
 
@@ -72,41 +75,43 @@ func CreateArticle(c *fiber.Ctx, db *gorm.DB) error {
 
 	if err := db.Create(&data).Error; err != nil {
 		logrus.Error(err)
-		response.StatusCode = 500
-		response.ErrMsg = err.Error()
-		return c.Status(fiber.StatusInternalServerError).JSON(response)
+		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
+			StatusCode: 500,
+			ErrMsg:     err.Error(),
+		})
 	}
 
 	logrus.Info("Article資料建立成功: " + clientData.Title)
-	response.Data = &data
-	response.InfoMsg = "Article資料建立成功: " + clientData.Title
-	return c.Status(fiber.StatusOK).JSON(response)
+	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[any]{
+		StatusCode: 200,
+		InfoMsg:    "Article資料建立成功: " + clientData.Title,
+	})
 }
 
-func UpdateArticle(c *fiber.Ctx, db *gorm.DB) error {
-	// load client data
-	var clientData 
-	if err := c.BodyParser(&clientData); err != nil {
-		logrus.Error(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"msg": err.Error(),
-		})
-	}
-	response := dto.CreateDefalutCommonResponse[[]model.Article]()
+// func UpdateArticle(c *fiber.Ctx, db *gorm.DB) error {
+// 	// load client data
+// 	var clientData
+// 	if err := c.BodyParser(&clientData); err != nil {
+// 		logrus.Error(err)
+// 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+// 			"msg": err.Error(),
+// 		})
+// 	}
+// 	response := dto.CreateDefalutCommonResponse[[]model.Article]()
 
-}
+// }
 
 // Delete article data
 func DeleteArticle(c *fiber.Ctx, db *gorm.DB) error {
-	response := dto.CreateDefalutCommonResponse[[]model.Article]()
 
 	// URL decoding
 	id, err := url.QueryUnescape(c.Params("id"))
 	if err != nil {
 		logrus.Error(err)
-		response.StatusCode = 400
-		response.ErrMsg = err.Error()
-		return c.Status(fiber.StatusBadRequest).JSON(response)
+		return c.Status(fiber.StatusBadRequest).JSON(dto.CommonResponse[any]{
+			StatusCode: 400,
+			ErrMsg:     err.Error(),
+		})
 	}
 
 	var article model.Article
@@ -117,22 +122,24 @@ func DeleteArticle(c *fiber.Ctx, db *gorm.DB) error {
 	db.Delete(&article)
 
 	logrus.Info("刪除Article成功" + id)
-	response.InfoMsg = "刪除Article成功" + id
-	return c.Status(fiber.StatusOK).JSON(response)
+	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[any]{
+		StatusCode: 200,
+		InfoMsg:    "刪除Article成功" + id,
+	})
 }
 
 // Query Article data use tag name
 func QueryArticleForTag(c *fiber.Ctx, db *gorm.DB) error {
 	var data []model.Article
-	response := dto.CreateDefalutCommonResponse[[]model.Article]()
 
 	// URL decoding
 	name, err := url.QueryUnescape(c.Params("name"))
 	if err != nil {
 		logrus.Error(err)
-		response.StatusCode = 400
-		response.ErrMsg = err.Error()
-		return c.Status(fiber.StatusBadRequest).JSON(response)
+		return c.Status(fiber.StatusBadRequest).JSON(dto.CommonResponse[any]{
+			StatusCode: 400,
+			ErrMsg:     err.Error(),
+		})
 	}
 	err = db.Joins("JOIN article_tags ON article_tags.article_id = articles.id").
 		Joins("JOIN tags ON tags.name = article_tags.tag_name").
@@ -140,12 +147,15 @@ func QueryArticleForTag(c *fiber.Ctx, db *gorm.DB) error {
 		Find(&data).Error
 	if err != nil {
 		logrus.Error(err)
-		response.StatusCode = 500
-		response.ErrMsg = err.Error()
-		return c.Status(fiber.StatusInternalServerError).JSON(response)
+		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
+			StatusCode: 500,
+			ErrMsg:     err.Error(),
+		})
 	}
 	logrus.Info("查詢指定Tag的Article成功: " + name)
-	response.Data = &data
-	response.InfoMsg = "查詢指定Tag的Article成功" + name
-	return c.Status(fiber.StatusOK).JSON(response)
+	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[[]model.Article]{
+		StatusCode: 200,
+		InfoMsg:    "查詢指定Tag的Article成功" + name,
+		Data:       &data,
+	})
 }
