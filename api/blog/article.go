@@ -83,6 +83,44 @@ func CreateArticle(c *fiber.Ctx, db *gorm.DB) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+func UpdateArticle(c *fiber.Ctx, db *gorm.DB) error {
+	// load client data
+	var clientData 
+	if err := c.BodyParser(&clientData); err != nil {
+		logrus.Error(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"msg": err.Error(),
+		})
+	}
+	response := dto.CreateDefalutCommonResponse[[]model.Article]()
+
+}
+
+// Delete article data
+func DeleteArticle(c *fiber.Ctx, db *gorm.DB) error {
+	response := dto.CreateDefalutCommonResponse[[]model.Article]()
+
+	// URL decoding
+	id, err := url.QueryUnescape(c.Params("id"))
+	if err != nil {
+		logrus.Error(err)
+		response.StatusCode = 400
+		response.ErrMsg = err.Error()
+		return c.Status(fiber.StatusBadRequest).JSON(response)
+	}
+
+	var article model.Article
+	db.Preload("Tags").First(&article, id)
+
+	db.Model(&article).Association("Tags").Clear()
+
+	db.Delete(&article)
+
+	logrus.Info("刪除Article成功" + id)
+	response.InfoMsg = "刪除Article成功" + id
+	return c.Status(fiber.StatusOK).JSON(response)
+}
+
 // Query Article data use tag name
 func QueryArticleForTag(c *fiber.Ctx, db *gorm.DB) error {
 	var data []model.Article
@@ -109,30 +147,5 @@ func QueryArticleForTag(c *fiber.Ctx, db *gorm.DB) error {
 	logrus.Info("查詢指定Tag的Article成功: " + name)
 	response.Data = &data
 	response.InfoMsg = "查詢指定Tag的Article成功" + name
-	return c.Status(fiber.StatusOK).JSON(response)
-}
-
-// Delete article data
-func DeleteArticle(c *fiber.Ctx, db *gorm.DB) error {
-	response := dto.CreateDefalutCommonResponse[[]model.Article]()
-
-	// URL decoding
-	id, err := url.QueryUnescape(c.Params("id"))
-	if err != nil {
-		logrus.Error(err)
-		response.StatusCode = 400
-		response.ErrMsg = err.Error()
-		return c.Status(fiber.StatusBadRequest).JSON(response)
-	}
-
-	var article model.Article
-	db.Preload("Tags").First(&article, id)
-
-	db.Model(&article).Association("Tags").Clear()
-
-	db.Delete(&article)
-
-	logrus.Info("刪除Article成功" + id)
-	response.InfoMsg = "刪除Article成功" + id
 	return c.Status(fiber.StatusOK).JSON(response)
 }

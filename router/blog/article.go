@@ -19,6 +19,10 @@ func articleRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName strin
 		return api.CreateArticle(c, dbs[dbName])
 	})
 
+	articleGroup.Post("/:id", func(c *fiber.Ctx) error {
+		return api.ModifyArticle(c, dbs[dbName])
+	})
+
 	articleGroup.Delete("/:id", func(c *fiber.Ctx) error {
 		return api.DeleteArticle(c, dbs[dbName])
 	})
