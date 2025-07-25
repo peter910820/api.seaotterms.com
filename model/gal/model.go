@@ -16,6 +16,57 @@ import (
 // 	UpdatedName  string    `json:"updatedName"`
 // }
 
+// Galgame Brand資料主表
+type BrandDetail struct {
+	ID          int       `gorm:"primaryKey" json:"id"`
+	Name        string    `gorm:"NOT NULL" json:"name"`
+	WorkAmount  int       `gorm:"NOT NULL; default:0" json:"workAmount"`      // 作品數量
+	Dissolution bool      `gorm:"NOT NULL; default:false" json:"dissolution"` // 解散標記
+	CreatedAt   time.Time `gorm:"NOT NULL; autoCreateTime" json:"createdAt"`
+	CreatedName string    `gorm:"NOT NULL" json:"createdName"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	UpdatedName string    `json:"updatedName"`
+}
+
+// Galgame遊戲資料主表
+type GameDetail struct {
+	ID              int       `gorm:"primaryKey" json:"id"`
+	Name            string    `gorm:"NOT NULL" json:"name"`
+	ChineseName     string    `json:"chineseName"`
+	BrandID         string    `gorm:"NOT NULL; uniqueIndex" json:"brandId"`
+	AllAges         bool      `gorm:"NOT NULL" json:"allAges"`
+	ReleaseDate     time.Time `gorm:"NOT NULL" json:"releaseDate"`
+	OpUrl           string    `json:"opUrl"`
+	GameDescription string    `json:"gameDescription"`
+	VndbEvaluate    *float64  `json:"vndbEvaluate"`
+	CreatedAt       time.Time `gorm:"NOT NULL; autoCreateTime" json:"createdAt"`
+	CreatedName     string    `gorm:"NOT NULL" json:"createdName"`
+	UpdatedAt       time.Time `json:"updatedAt"`
+	UpdatedName     string    `json:"updatedName"`
+}
+
+// 自己的Galgame遊戲評分紀錄主表
+type PlayRecord struct {
+	ID                   int       `gorm:"primaryKey" json:"id"`
+	GameID               int       `gorm:"NOT NULL; uniqueIndex" json:"gameId"`
+	EndPlayDate          time.Time `gorm:"NOT NULL" json:"endPlayDate"`
+	OpDisplayScore       *float64  `json:"opDisplayScore"`
+	OpSongScore          *float64  `json:"opSongScore"`
+	OpCompatibilityScore *float64  `json:"opCompatibilityScore"`
+	EdDisplayScore       *float64  `json:"edDisplayScore"`
+	EdSongScore          *float64  `json:"edSongScore"`
+	MusicScore           *float64  `json:"musicScore"`
+	PlotScore            float64   `json:"plotScore"`
+	ArtScore             float64   `json:"artScore"`
+	SystemScore          float64   `json:"systemScore"`
+	ThemeScore           float64   `json:"themeScore"`
+	ConclusionScore      float64   `json:"conclusionScore"`
+	Category             string    `gorm:"NOT NULL; default:一般" json:"category"`
+	Recommended          int       `gorm:"NOT NULL; default:0" json:"recommended"`
+	CreatedName          string    `gorm:"NOT NULL" json:"createdName"`
+	UpdatedName          string    `json:"updatedName"`
+}
+
 // galgame brand record schema
 type BrandRecord struct {
 	Brand       string    `gorm:"primaryKey" json:"brand"`          // PK
