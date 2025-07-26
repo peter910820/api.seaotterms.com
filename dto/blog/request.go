@@ -51,5 +51,6 @@ type QuickSystemTodoUpdateRequest struct {
 type BrandCreateRequest struct {
 	Name        string `json:"name"`
 	WorkAmount  int    `json:"workAmount"`  // 作品數量
+	OfficialUrl string `json:"officialUrl"` // 官網URL
 	Dissolution bool   `json:"dissolution"` // 解散標記
 }

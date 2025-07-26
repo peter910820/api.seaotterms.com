@@ -44,6 +44,7 @@ func CreateBrand(c *fiber.Ctx, db *gorm.DB) error {
 	data := model.Brand{
 		Name:        requestData.Name,
 		WorkAmount:  requestData.WorkAmount,
+		OfficialUrl: requestData.OfficialUrl,
 		Dissolution: requestData.Dissolution,
 		CreatedAt:   time.Now(),
 		CreatedName: "seaotterms",
