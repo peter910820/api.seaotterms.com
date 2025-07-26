@@ -17,7 +17,7 @@ import (
 // }
 
 // Galgame Brand資料主表
-type BrandDetail struct {
+type Brand struct {
 	ID          int       `gorm:"primaryKey" json:"id"`
 	Name        string    `gorm:"NOT NULL" json:"name"`
 	WorkAmount  int       `gorm:"NOT NULL; default:0" json:"workAmount"`      // 作品數量
@@ -29,11 +29,11 @@ type BrandDetail struct {
 }
 
 // Galgame遊戲資料主表
-type GameDetail struct {
+type Game struct {
 	ID              int       `gorm:"primaryKey" json:"id"`
 	Name            string    `gorm:"NOT NULL" json:"name"`
 	ChineseName     string    `json:"chineseName"`
-	BrandID         string    `gorm:"NOT NULL; uniqueIndex" json:"brandId"`
+	BrandID         string    `gorm:"NOT NULL" json:"brandId"`
 	AllAges         bool      `gorm:"NOT NULL" json:"allAges"`
 	ReleaseDate     time.Time `gorm:"NOT NULL" json:"releaseDate"`
 	OpUrl           string    `json:"opUrl"`

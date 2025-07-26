@@ -48,3 +48,8 @@ type QuickSystemTodoUpdateRequest struct {
 	UpdatedAt   time.Time `json:"updatedAt"`
 	UpdatedName string    `json:"updatedName"`
 }
+type BrandCreateRequest struct {
+	Name        string `json:"name"`
+	WorkAmount  int    `json:"workAmount"`  // 作品數量
+	Dissolution bool   `json:"dissolution"` // 解散標記
+}

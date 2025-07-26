@@ -1,0 +1,21 @@
+package blog
+
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
+	"gorm.io/gorm"
+
+	api "api.seaotterms.com/api/blog"
+)
+
+func brandRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
+	brandGroup := blogGroup.Group("/brand")
+
+	brandGroup.Get("/", func(c *fiber.Ctx) error {
+		return api.QueryBrand(c, dbs[dbName])
+	})
+
+	brandGroup.Post("/", func(c *fiber.Ctx) error {
+		return api.CreateBrand(c, dbs[dbName])
+	})
+}
