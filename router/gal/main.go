@@ -1,4 +1,4 @@
-package galgame
+package gal
 
 import (
 	"os"

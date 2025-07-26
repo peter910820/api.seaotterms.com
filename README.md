@@ -5,3 +5,12 @@
     * blog/seaotterms.com: 主站(前後端分離中)
     * gal/gal.seaotterms.com: galgame文章資源分享站(開發中)
     * teach/teach.seaotterms.com: 教學文章站(關閉中)
+
+## 專案架構
+
+### api模組
+* 存放API方法，用**站台別**分子模組
+### model模組
+* 存放資料表結構，用**資料庫別**分子模組  
+
+待補
