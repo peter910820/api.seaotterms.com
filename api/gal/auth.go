@@ -13,7 +13,7 @@ import (
 	"gorm.io/gorm"
 
 	dto "api.seaotterms.com/dto/gal"
-	model "api.seaotterms.com/model/gal"
+	model "api.seaotterms.com/model/galgame"
 	utils "api.seaotterms.com/utils/gal"
 )
 
