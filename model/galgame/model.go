@@ -25,7 +25,7 @@ type Brand struct {
 	Dissolution bool      `gorm:"NOT NULL; default:false" json:"dissolution"` // 解散標記
 	CreatedAt   time.Time `gorm:"NOT NULL; autoCreateTime" json:"createdAt"`
 	CreatedName string    `gorm:"NOT NULL" json:"createdName"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	UpdatedAt   time.Time `json:"updatedAt"` // 建立資料的時候，因為該欄位的名字，所以gorm也會預設填值，無需特別定義NOT NULL
 	UpdatedName string    `json:"updatedName"`
 }
 
