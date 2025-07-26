@@ -21,6 +21,7 @@ type Brand struct {
 	ID          int       `gorm:"primaryKey" json:"id"`
 	Name        string    `gorm:"NOT NULL" json:"name"`
 	WorkAmount  int       `gorm:"NOT NULL; default:0" json:"workAmount"`      // 作品數量
+	OfficialUrl string    `json:"officialUrl"`                                // 官網URL
 	Dissolution bool      `gorm:"NOT NULL; default:false" json:"dissolution"` // 解散標記
 	CreatedAt   time.Time `gorm:"NOT NULL; autoCreateTime" json:"createdAt"`
 	CreatedName string    `gorm:"NOT NULL" json:"createdName"`
