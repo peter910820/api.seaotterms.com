@@ -8,7 +8,7 @@ import (
 )
 
 func articleRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
-	articleGroup := blogGroup.Group("/article")
+	articleGroup := blogGroup.Group("/articles")
 
 	articleGroup.Get("/", func(c *fiber.Ctx) error {
 		return api.QueryArticle(c, dbs[dbName])

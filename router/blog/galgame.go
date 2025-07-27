@@ -12,7 +12,7 @@ import (
 )
 
 func GalgameRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
-	galgameGroup := blogGroup.Group("/galgame")
+	galgameGroup := blogGroup.Group("/galgames")
 
 	galgameGroup.Get("/s/:name", middleware.CheckLogin(store, dbs[dbName]), func(c *fiber.Ctx) error {
 		return api.QueryGalgame(c, dbs[os.Getenv("DB_NAME2")])

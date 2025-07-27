@@ -10,7 +10,7 @@ import (
 )
 
 func TodoRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
-	todoGroup := blogGroup.Group("/todo")
+	todoGroup := blogGroup.Group("/todos")
 
 	todoGroup.Get("/:owner", func(c *fiber.Ctx) error {
 		return api.QueryTodoByOwner(c, dbs[dbName])
