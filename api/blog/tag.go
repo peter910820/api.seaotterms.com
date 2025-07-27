@@ -17,22 +17,30 @@ type TagData struct {
 }
 
 func QueryTag(c *fiber.Ctx, db *gorm.DB) error {
-	var tagData []model.Tag
+	var responseData []model.Tag
 
-	result := db.Order("name desc").Find(&tagData)
-	if result.Error != nil {
+	err := db.Order("created_at desc").Find(&responseData).Error
+	if err != nil {
+		logrus.Error(err)
 		// if record not exist
-		if result.Error == gorm.ErrRecordNotFound {
-			logrus.Error(result.Error)
-			return c.SendStatus(fiber.StatusNotFound)
+		if err == gorm.ErrRecordNotFound {
+			return c.Status(fiber.StatusNotFound).JSON(dto.CommonResponse[any]{
+				StatusCode: 404,
+				ErrMsg:     err.Error(),
+			})
 		} else {
-			logrus.Error(result.Error)
-			return c.SendStatus(fiber.StatusInternalServerError)
+			return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
+				StatusCode: 500,
+				ErrMsg:     err.Error(),
+			})
 		}
 	}
-	logrus.Info("查詢全部tag資料成功")
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"data": tagData,
+
+	logrus.Info("Tag資料查詢成功")
+	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[[]model.Tag]{
+		StatusCode: 200,
+		InfoMsg:    "Tag資料查詢成功",
+		Data:       &responseData,
 	})
 }
 

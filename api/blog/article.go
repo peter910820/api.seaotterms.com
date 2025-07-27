@@ -14,27 +14,36 @@ import (
 
 // query article data (all or use id to query single article data)
 func QueryArticle(c *fiber.Ctx, db *gorm.DB) error {
-	var data []model.Article
+	var responseData []model.Article
 	var err error
 
-	id := c.Query("id")
-	if id != "" {
-		err = db.Preload("Tags").First(&data, id).Error
-	} else {
-		err = db.Preload("Tags").Order("created_at desc").Find(&data).Error
-	}
+	articleID, err := url.QueryUnescape(c.Params("id"))
 	if err != nil {
-		logrus.Error(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[[]model.Article]{
+		logrus.Fatal(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
 			StatusCode: 500,
 			ErrMsg:     err.Error(),
 		})
 	}
+
+	if articleID != "" {
+		err = db.Preload("Tags").First(&responseData, articleID).Error
+	} else {
+		err = db.Preload("Tags").Order("created_at desc").Find(&responseData).Error
+	}
+	if err != nil {
+		logrus.Error(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
+			StatusCode: 500,
+			ErrMsg:     err.Error(),
+		})
+	}
+
 	logrus.Info("Article資料查詢成功")
 	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[[]model.Article]{
 		StatusCode: 200,
 		InfoMsg:    "Article資料查詢成功",
-		Data:       &data,
+		Data:       &responseData,
 	})
 }
 
@@ -130,7 +139,7 @@ func DeleteArticle(c *fiber.Ctx, db *gorm.DB) error {
 
 // Query Article data use tag name
 func QueryArticleForTag(c *fiber.Ctx, db *gorm.DB) error {
-	var data []model.Article
+	var responseData []model.Article
 
 	// URL decoding
 	name, err := url.QueryUnescape(c.Params("name"))
@@ -144,7 +153,7 @@ func QueryArticleForTag(c *fiber.Ctx, db *gorm.DB) error {
 	err = db.Joins("JOIN article_tags ON article_tags.article_id = articles.id").
 		Joins("JOIN tags ON tags.name = article_tags.tag_name").
 		Where("tags.name = ?", name).
-		Find(&data).Error
+		Find(&responseData).Error
 	if err != nil {
 		logrus.Error(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
@@ -156,6 +165,6 @@ func QueryArticleForTag(c *fiber.Ctx, db *gorm.DB) error {
 	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[[]model.Article]{
 		StatusCode: 200,
 		InfoMsg:    "查詢指定Tag的Article成功" + name,
-		Data:       &data,
+		Data:       &responseData,
 	})
 }

@@ -14,6 +14,10 @@ func articleRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName strin
 		return api.QueryArticle(c, dbs[dbName])
 	})
 
+	articleGroup.Get("/:id", func(c *fiber.Ctx) error {
+		return api.QueryArticle(c, dbs[dbName])
+	})
+
 	// No middleware has been implemented yet
 	articleGroup.Post("/", func(c *fiber.Ctx) error {
 		return api.CreateArticle(c, dbs[dbName])
