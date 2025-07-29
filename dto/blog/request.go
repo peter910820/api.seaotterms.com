@@ -69,6 +69,16 @@ type BrandCreateRequest struct {
 	Dissolution bool   `json:"dissolution"` // 解散標記
 }
 
+type GameCreateRequest struct {
+	Name            string    `json:"name"`
+	ChineseName     string    `json:"chineseName"`
+	BrandID         int       `json:"brandId"`
+	AllAges         bool      `json:"allAges"`
+	ReleaseDate     time.Time `json:"releaseDate"`
+	OpUrl           string    `json:"opUrl"`
+	GameDescription string    `json:"gameDescription"`
+}
+
 type RegisterRequest struct {
 	Username      string `json:"username"`
 	Email         string `json:"email"`

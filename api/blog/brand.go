@@ -35,8 +35,8 @@ func CreateBrand(c *fiber.Ctx, db *gorm.DB) error {
 
 	if err := c.BodyParser(&requestData); err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-			StatusCode: 500,
+		return c.Status(fiber.StatusBadRequest).JSON(dto.CommonResponse[any]{
+			StatusCode: 400,
 			ErrMsg:     err.Error(),
 		})
 	}

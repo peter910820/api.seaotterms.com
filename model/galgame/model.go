@@ -34,7 +34,7 @@ type Game struct {
 	ID              int       `gorm:"primaryKey" json:"id"`
 	Name            string    `gorm:"NOT NULL" json:"name"`
 	ChineseName     string    `json:"chineseName"`
-	BrandID         string    `gorm:"NOT NULL" json:"brandId"`
+	BrandID         int       `gorm:"NOT NULL" json:"brandId"`
 	AllAges         bool      `gorm:"NOT NULL" json:"allAges"`
 	ReleaseDate     time.Time `gorm:"NOT NULL" json:"releaseDate"`
 	OpUrl           string    `json:"opUrl"`
