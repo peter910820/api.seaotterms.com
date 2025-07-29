@@ -44,9 +44,10 @@ func QuerySystemTodo(c *fiber.Ctx, db *gorm.DB) error {
 		}
 	}
 	logrus.Info("查詢SystemTodo資料成功")
-	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[any]{
+	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[[]model.SystemTodo]{
 		StatusCode: 200,
 		InfoMsg:    "查詢SystemTodo資料成功: ",
+		Data:       &data,
 	})
 }
 

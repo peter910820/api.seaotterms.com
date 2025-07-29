@@ -49,6 +49,19 @@ type QuickSystemTodoUpdateRequest struct {
 	UpdatedAt   time.Time `json:"updatedAt"`
 	UpdatedName string    `json:"updatedName"`
 }
+
+type TodoTopicCreateRequest struct {
+	TopicName  string `json:"topicName"`
+	TopicOwner string `json:"topicOwner"`
+	UpdateName string `json:"updateName"`
+}
+
+type TodoUpdateRequest struct {
+	Status     uint      `json:"status"`
+	UpdatedAt  time.Time `json:"updatedAt"`
+	UpdateName string    `json:"updateName"`
+}
+
 type BrandCreateRequest struct {
 	Name        string `json:"name"`
 	WorkAmount  int    `json:"workAmount"`  // 作品數量
