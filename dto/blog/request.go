@@ -68,3 +68,22 @@ type BrandCreateRequest struct {
 	OfficialUrl string `json:"officialUrl"` // 官網URL
 	Dissolution bool   `json:"dissolution"` // 解散標記
 }
+
+type RegisterRequest struct {
+	Username      string `json:"username"`
+	Email         string `json:"email"`
+	Password      string `json:"password"`
+	CheckPassword string `json:"checkPassword"`
+}
+
+type UserUpdateRequest struct {
+	ID         uint      `json:"id"`
+	Username   string    `json:"username"`
+	Email      string    `json:"email"`
+	Exp        int       `json:"exp"`
+	Management bool      `json:"management"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
+	UpdateName string    `json:"update_name"`
+	Avatar     string    `json:"avatar"`
+}
