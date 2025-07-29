@@ -40,6 +40,7 @@ type SystemTodoUpdateRequest struct {
 	Status      uint       `json:"status"`
 	Deadline    *time.Time `json:"deadline"`
 	Urgency     uint       `json:"urgency"`
+	UpdatedAt   time.Time  `json:"updatedAt"`
 	UpdatedName string     `json:"updatedName"`
 }
 

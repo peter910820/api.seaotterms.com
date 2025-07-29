@@ -12,53 +12,41 @@ import (
 	model "api.seaotterms.com/model/blog"
 )
 
-type SystemTodoUpdate struct {
-	SystemName  string     `json:"systemName"`
-	Title       string     `json:"title"`
-	Detail      string     `json:"detail"`
-	Status      uint       `json:"status"`
-	Deadline    *time.Time `json:"deadline"`
-	Urgency     uint       `json:"urgency"`
-	UpdatedAt   time.Time  `json:"updatedAt"`
-	UpdatedName string     `json:"updatedName"`
-}
-
 func QuerySystemTodo(c *fiber.Ctx, db *gorm.DB) error {
 	// get query param
 	id := c.Query("id")
 	systemName := c.Query("system_name")
 
 	var data []model.SystemTodo
-	var r *gorm.DB
+	var err error
 	if id == "" && systemName == "" {
-		r = db.Order("COALESCE(updated_at, created_at) DESC").Find(&data)
+		err = db.Order("COALESCE(updated_at, created_at) DESC").Find(&data).Error
 	} else {
 		if id != "" {
-			r = db.Where("id = ?", id).Order("COALESCE(updated_at, created_at) DESC").Find(&data)
+			err = db.Where("id = ?", id).Order("COALESCE(updated_at, created_at) DESC").Find(&data).Error
 		} else {
-			r = db.Where("system_name = ?", systemName).Order("COALESCE(updated_at, created_at) DESC").Find(&data)
+			err = db.Where("system_name = ?", systemName).Order("COALESCE(updated_at, created_at) DESC").Find(&data).Error
 		}
 	}
-	if r.Error != nil {
+	if err != nil {
+		logrus.Error(err)
 		// if record not exist
-		if r.Error == gorm.ErrRecordNotFound {
-			logrus.Error(r.Error)
-			//404
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"msg": r.Error.Error(),
+		if err == gorm.ErrRecordNotFound {
+			return c.Status(fiber.StatusNotFound).JSON(dto.CommonResponse[any]{
+				StatusCode: 404,
+				ErrMsg:     "找不到SystemTodo資料",
 			})
 		} else {
-			logrus.Fatal(r.Error.Error())
-			// 500
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"msg": r.Error.Error(),
+			return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
+				StatusCode: 500,
+				ErrMsg:     err.Error(),
 			})
 		}
 	}
-	logrus.Info("Query system_Todos table success")
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"msg":  "查詢SystemTodo資料成功",
-		"data": data,
+	logrus.Info("查詢SystemTodo資料成功")
+	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[any]{
+		StatusCode: 200,
+		InfoMsg:    "查詢SystemTodo資料成功: ",
 	})
 }
 
@@ -66,9 +54,10 @@ func CreateSystemTodo(c *fiber.Ctx, db *gorm.DB) error {
 	// load client data
 	var clientData dto.SystemTodoCreateRequest
 	if err := c.BodyParser(&clientData); err != nil {
-		logrus.Error(err.Error())
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"msg": err.Error(),
+		logrus.Error(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
+			StatusCode: 500,
+			ErrMsg:     err.Error(),
 		})
 	}
 
@@ -81,16 +70,19 @@ func CreateSystemTodo(c *fiber.Ctx, db *gorm.DB) error {
 		Urgency:     clientData.Urgency,
 		CreatedName: clientData.CreatedName,
 	}
-	r := db.Create(&data)
-	if r.Error != nil {
-		logrus.Error(r.Error)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"msg": r.Error.Error(),
+
+	err := db.Create(&data).Error
+	if err != nil {
+		logrus.Error(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
+			StatusCode: 500,
+			ErrMsg:     err.Error(),
 		})
 	}
 	logrus.Infof("系統代辦資料 %s 創建成功", clientData.Title)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"msg": fmt.Sprintf("系統代辦資料 %s 創建成功", clientData.Title),
+	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[any]{
+		StatusCode: 200,
+		InfoMsg:    fmt.Sprintf("系統代辦資料 %s 創建成功", clientData.Title),
 	})
 }
 
@@ -99,39 +91,34 @@ func UpdateSystemTodo(c *fiber.Ctx, db *gorm.DB) error {
 	var clientData dto.SystemTodoUpdateRequest
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"msg": err.Error(),
+		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
+			StatusCode: 500,
+			ErrMsg:     err.Error(),
 		})
 	}
-	updateData := SystemTodoUpdate{
-		SystemName:  clientData.SystemName,
-		Title:       clientData.Title,
-		Detail:      clientData.Detail,
-		Status:      clientData.Status,
-		Deadline:    clientData.Deadline,
-		Urgency:     clientData.Urgency,
-		UpdatedAt:   time.Now(),
-		UpdatedName: clientData.UpdatedName,
-	}
-	r := db.Model(&model.SystemTodo{}).Where("id = ?", c.Params("id")).
+	clientData.UpdatedAt = time.Now()
+	err := db.Model(&model.SystemTodo{}).Where("id = ?", c.Params("id")).
 		Select("system_name", "title", "detail", "status", "deadline", "urgency", "updated_at", "updated_name").
-		Updates(updateData)
-	if r.Error != nil {
-		logrus.Error(r.Error)
+		Updates(clientData).Error
+	if err != nil {
+		logrus.Error(err)
 		// if record not exist
-		if r.Error == gorm.ErrRecordNotFound {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"msg": r.Error.Error(),
+		if err == gorm.ErrRecordNotFound {
+			return c.Status(fiber.StatusNotFound).JSON(dto.CommonResponse[any]{
+				StatusCode: 404,
+				ErrMsg:     "找不到該SystemTodo資料",
 			})
 		} else {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"msg": r.Error.Error(),
+			return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
+				StatusCode: 500,
+				ErrMsg:     err.Error(),
 			})
 		}
 	}
 	logrus.Infof("SystemTodo %s 更新成功", c.Params("id"))
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"msg": fmt.Sprintf("SystemTodo %s 更新成功", c.Params("id")),
+	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[any]{
+		StatusCode: 200,
+		InfoMsg:    fmt.Sprintf("SystemTodo %s 更新成功", c.Params("id")),
 	})
 }
 
@@ -140,50 +127,57 @@ func QuickUpdateSystemTodo(c *fiber.Ctx, db *gorm.DB) error {
 	var clientData dto.QuickSystemTodoUpdateRequest
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"msg": err.Error(),
+		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
+			StatusCode: 500,
+			ErrMsg:     err.Error(),
 		})
 	}
 	clientData.UpdatedAt = time.Now()
-	r := db.Model(&model.SystemTodo{}).Where("id = ?", c.Params("id")).
+	err := db.Model(&model.SystemTodo{}).Where("id = ?", c.Params("id")).
 		Select("status", "updated_at", "updated_name").
-		Updates(clientData)
-	if r.Error != nil {
-		logrus.Error(r.Error)
+		Updates(clientData).Error
+	if err != nil {
+		logrus.Error(err)
 		// if record not exist
-		if r.Error == gorm.ErrRecordNotFound {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"msg": r.Error.Error(),
+		if err == gorm.ErrRecordNotFound {
+			return c.Status(fiber.StatusNotFound).JSON(dto.CommonResponse[any]{
+				StatusCode: 404,
+				ErrMsg:     "找不到該SystemTodo資料",
 			})
 		} else {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"msg": r.Error.Error(),
+			return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
+				StatusCode: 500,
+				ErrMsg:     err.Error(),
 			})
 		}
 	}
 	logrus.Infof("SystemTodo %s 更新成功", c.Params("id"))
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"msg": fmt.Sprintf("SystemTodo %s 更新成功", c.Params("id")),
+	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[any]{
+		StatusCode: 200,
+		InfoMsg:    fmt.Sprintf("SystemTodo %s 更新成功", c.Params("id")),
 	})
 }
 
 func DeleteSystemTodo(c *fiber.Ctx, db *gorm.DB) error {
-	r := db.Where("id = ?", c.Params("id")).Delete(&model.SystemTodo{})
-	if r.Error != nil {
-		logrus.Error(r.Error)
+	err := db.Where("id = ?", c.Params("id")).Delete(&model.SystemTodo{}).Error
+	if err != nil {
+		logrus.Error(err)
 		// if record not exist
-		if r.Error == gorm.ErrRecordNotFound {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"msg": r.Error.Error(),
+		if err == gorm.ErrRecordNotFound {
+			return c.Status(fiber.StatusNotFound).JSON(dto.CommonResponse[any]{
+				StatusCode: 404,
+				ErrMsg:     "找不到該SystemTodo資料",
 			})
 		} else {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"msg": r.Error.Error(),
+			return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
+				StatusCode: 500,
+				ErrMsg:     err.Error(),
 			})
 		}
 	}
 	logrus.Infof("SystemTodo %s 刪除成功", c.Params("id"))
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"msg": fmt.Sprintf("SystemTodo %s 刪除成功", c.Params("id")),
+	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[any]{
+		StatusCode: 200,
+		InfoMsg:    fmt.Sprintf("SystemTodo %s 刪除成功", c.Params("id")),
 	})
 }
