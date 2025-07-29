@@ -9,7 +9,7 @@ import (
 	middleware "api.seaotterms.com/middleware/blog"
 )
 
-func TodoTopicRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
+func todoTopicRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
 	todoTopicGroup := blogGroup.Group("/todo-topics")
 
 	todoTopicGroup.Get("/:owner", func(c *fiber.Ctx) error {

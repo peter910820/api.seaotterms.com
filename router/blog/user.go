@@ -9,7 +9,7 @@ import (
 	middleware "api.seaotterms.com/middleware/blog"
 )
 
-func UserRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
+func userRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
 	userGroup := blogGroup.Group("/users")
 
 	userGroup.Post("/", func(c *fiber.Ctx) error {

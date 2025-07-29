@@ -10,7 +10,7 @@ import (
 )
 
 // this router is use to check identity for front-end routes
-func AuthRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
+func authRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
 	authGroup := blogGroup.Group("/auth")
 
 	authGroup.Get("/", middleware.CheckLogin(store, dbs[dbName]), func(c *fiber.Ctx) error {
