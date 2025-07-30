@@ -79,6 +79,25 @@ type GameCreateRequest struct {
 	GameDescription string    `json:"gameDescription"`
 }
 
+type PlayRecordCreateRequest struct {
+	GameID               int       `json:"gameId"`
+	EndPlayDate          time.Time `json:"endPlayDate"`
+	OpDisplayScore       *float64  `json:"opDisplayScore"`
+	OpSongScore          *float64  `json:"opSongScore"`
+	OpCompatibilityScore *float64  `json:"opCompatibilityScore"`
+	EdDisplayScore       *float64  `json:"edDisplayScore"`
+	EdSongScore          *float64  `json:"edSongScore"`
+	MusicScore           *float64  `json:"musicScore"`
+	PlotScore            float64   `json:"plotScore"`
+	ArtScore             float64   `json:"artScore"`
+	SystemScore          float64   `json:"systemScore"`
+	ThemeScore           float64   `json:"themeScore"`
+	ConclusionScore      float64   `json:"conclusionScore"`
+	Category             string    `json:"category"`
+	Recommended          int       `json:"recommended"`
+	Experience           string    `json:"experience"`
+}
+
 type RegisterRequest struct {
 	Username      string `json:"username"`
 	Email         string `json:"email"`
