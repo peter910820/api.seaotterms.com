@@ -51,9 +51,9 @@ type PlayRecord struct {
 	ID                   int       `gorm:"primaryKey" json:"id"`
 	GameID               int       `gorm:"NOT NULL; uniqueIndex" json:"gameId"`
 	EndPlayDate          time.Time `gorm:"NOT NULL" json:"endPlayDate"`
-	OpDisplayScore       *float64  `json:"opDisplayScore"`
-	OpSongScore          *float64  `json:"opSongScore"`
-	OpCompatibilityScore *float64  `json:"opCompatibilityScore"`
+	OpDisplayScore       *float64  `json:"opDisplayScore"`       // OP畫面分數，可能沒有值
+	OpSongScore          *float64  `json:"opSongScore"`          // OP歌曲分數，可能沒有值
+	OpCompatibilityScore *float64  `json:"opCompatibilityScore"` // OP畫面契合度分數，可能沒有值
 	EdDisplayScore       *float64  `json:"edDisplayScore"`
 	EdSongScore          *float64  `json:"edSongScore"`
 	MusicScore           *float64  `json:"musicScore"`
@@ -64,8 +64,9 @@ type PlayRecord struct {
 	ConclusionScore      float64   `json:"conclusionScore"`
 	Category             string    `gorm:"NOT NULL; default:一般" json:"category"`
 	Recommended          int       `gorm:"NOT NULL; default:0" json:"recommended"`
-	CreatedName          string    `gorm:"NOT NULL" json:"createdName"`
-	UpdatedName          string    `json:"updatedName"`
+	Experience           string    `json:"experience"`
+	CreatedAt            time.Time `gorm:"NOT NULL; autoCreateTime" json:"createdAt"`
+	UpdatedAt            time.Time `json:"updatedAt"`
 }
 
 // galgame brand record schema
