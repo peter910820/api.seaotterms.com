@@ -43,6 +43,7 @@ func init() {
 	if err != nil {
 		logrus.Fatalf(".env file load error: %v", err)
 	}
+	blogStore.CookieDomain = os.Getenv("SESSION_DOMAIN")
 }
 
 func main() {
