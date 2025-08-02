@@ -22,6 +22,7 @@ var (
 	// init store(session)
 	blogStore = session.New(session.Config{
 		Expiration:     7 * 24 * time.Hour,
+		CookieDomain:   os.Getenv("SESSION_DOMAIN"),
 		CookieSameSite: "None",
 		KeyLookup:      "cookie:user-session",
 		// CookieHTTPOnly: true,
