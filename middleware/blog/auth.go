@@ -34,7 +34,18 @@ func init() {
 // 用Token檢查使用者資料(預設全域註冊、回傳)
 func GetUserInfo(store *session.Store, db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		userInfo, _ := checkLogin(c, store)
+		sess, err := store.Get(c)
+		if err != nil {
+			logrus.Fatal(err)
+		}
+		userID := sess.Get("id")
+		if userID == nil {
+			return c.Next()
+		}
+		userInfo, ok := UserInfo[userID.(uint)]
+		if !ok {
+			logrus.Fatal(err) // 有Session但維護表遺失
+		}
 		c.Locals("user_info", userInfo)
 		return c.Next()
 	}

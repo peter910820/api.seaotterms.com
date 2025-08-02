@@ -2,15 +2,17 @@ package blog
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/sirupsen/logrus"
 
 	dto "api.seaotterms.com/dto/blog"
 )
 
 func ResponseFactory[T any](c *fiber.Ctx, httpStatus int, msg string, data *T) dto.CommonResponse[T] {
 	response := dto.CommonResponse[T]{}
-	userInfo, ok := c.Locals("user_info").(dto.UserInfo)
+	userInfo, ok := c.Locals("user_info").(*dto.UserInfo)
 	if ok {
-		response.UserInfo = &userInfo
+		response.UserInfo = userInfo
+		logrus.Debugf("%s 使用者資料版號: %d", response.UserInfo.Username, response.UserInfo.DataVersion)
 	}
 	response.StatusCode = httpStatus
 	response.Data = data

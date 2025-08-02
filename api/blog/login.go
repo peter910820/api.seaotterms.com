@@ -110,7 +110,5 @@ func setUserInfoSession(c *fiber.Ctx, store *session.Store, userInfo *dto.UserIn
 		logrus.Fatal(err) // 這邊之後會發送訊息
 	}
 
-	middleware.UserInfo[userInfo.ID] = userInfo
-
 	logrus.Infof("Username %s login success", userInfo.Username)
 }
