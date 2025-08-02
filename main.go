@@ -21,7 +21,9 @@ import (
 var (
 	// init store(session)
 	blogStore = session.New(session.Config{
-		Expiration: 7 * 24 * time.Hour,
+		Expiration:     7 * 24 * time.Hour,
+		CookieSameSite: "None",
+		KeyLookup:      "cookie:user-session",
 		// CookieHTTPOnly: true,
 	})
 	// management database connect
@@ -52,11 +54,15 @@ func main() {
 
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: os.Getenv("CORS_URL"),
-		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH",
-		AllowHeaders: "Origin,Content-Type,Accept",
+		AllowOrigins:     os.Getenv("CORS_URL"),
+		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH",
+		AllowHeaders:     "Origin,Content-Type,Accept",
+		AllowCredentials: true,
 	}))
-
+	logrus.Println("Session config:", session.Config{
+		CookieSecure:   false,
+		CookieSameSite: "None",
+	})
 	// api route group
 	apiGroup := app.Group("/api") // main api route group
 
