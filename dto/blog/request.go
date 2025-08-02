@@ -116,3 +116,9 @@ type UserUpdateRequest struct {
 	UpdateName string    `json:"update_name"`
 	Avatar     string    `json:"avatar"`
 }
+
+// login
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}

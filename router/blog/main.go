@@ -11,18 +11,26 @@ import (
 // 除了身份驗證表的資料庫，其餘資料庫名稱都定義在各站台router包的main.go中
 func BlogRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, store *session.Store) {
 	blogGroup := apiGroup.Group("/blog")
+
 	dbName := os.Getenv("DATABASE_NAME3")
 	dbName2 := os.Getenv("DATABASE_NAME2") // galgame DB
 
+	// article
 	articleRouter(blogGroup, dbs, dbName)
 	tagRouter(blogGroup, dbs, dbName)
+
 	todoRouter(blogGroup, dbs, dbName, store)
 	systemTodoRouter(blogGroup, dbs, dbName, store)
 	authRouter(blogGroup, dbs, dbName, store)
 	userRouter(blogGroup, dbs, dbName, store)
 	todoTopicRouter(blogGroup, dbs, dbName, store)
+
+	// galgame
 	GalgameRouter(blogGroup, dbs, dbName2, store)
 	GalgameBrandRouter(blogGroup, dbs, dbName2, store)
 	brandRouter(blogGroup, dbs, dbName2, store)
 	gameRouter(blogGroup, dbs, dbName2, store)
+
+	// login
+	loginRouter(blogGroup, dbs, dbName, store)
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func gameRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
-	brandGroup := blogGroup.Group("/galgame")
+	brandGroup := blogGroup.Group("/galgames")
 
 	brandGroup.Get("/", func(c *fiber.Ctx) error {
 		return api.QueryGame(c, dbs[dbName])

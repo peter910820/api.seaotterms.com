@@ -39,11 +39,11 @@ type Game struct {
 	ReleaseDate     time.Time `gorm:"NOT NULL" json:"releaseDate"`
 	OpUrl           string    `json:"opUrl"`
 	GameDescription string    `json:"gameDescription"`
-	VndbEvaluate    *float64  `json:"vndbEvaluate"`
-	CreatedAt       time.Time `gorm:"NOT NULL; autoCreateTime" json:"createdAt"`
-	CreatedName     string    `gorm:"NOT NULL" json:"createdName"`
-	UpdatedAt       time.Time `json:"updatedAt"`
-	UpdatedName     string    `json:"updatedName"`
+	// VndbEvaluate    *float64  `json:"vndbEvaluate"`
+	CreatedAt   time.Time `gorm:"NOT NULL; autoCreateTime" json:"createdAt"`
+	CreatedName string    `gorm:"NOT NULL" json:"createdName"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	UpdatedName string    `json:"updatedName"`
 }
 
 // 自己的Galgame遊戲評分紀錄主表
