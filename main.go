@@ -19,14 +19,8 @@ import (
 )
 
 var (
-	// init store(session)
-	blogStore = session.New(session.Config{
-		Expiration:     7 * 24 * time.Hour,
-		CookieDomain:   os.Getenv("SESSION_DOMAIN"),
-		CookieSameSite: "None",
-		KeyLookup:      "cookie:blog-user",
-		// CookieHTTPOnly: true,
-	})
+	// store
+	blogStore *session.Store
 	// management database connect
 	dbs = make(map[string]*gorm.DB)
 )
@@ -43,7 +37,15 @@ func init() {
 	if err != nil {
 		logrus.Fatalf(".env file load error: %v", err)
 	}
-	blogStore.CookieDomain = os.Getenv("SESSION_DOMAIN")
+
+	// init store
+	blogStore = session.New(session.Config{
+		Expiration:     7 * 24 * time.Hour,
+		CookieDomain:   os.Getenv("SESSION_DOMAIN"),
+		CookieSameSite: "None",
+		KeyLookup:      "cookie:blog-user-session",
+		// CookieHTTPOnly: true,
+	}) // blog user session
 }
 
 func main() {
