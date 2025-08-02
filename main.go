@@ -43,7 +43,7 @@ func init() {
 		Expiration:     7 * 24 * time.Hour,
 		CookieDomain:   os.Getenv("SESSION_DOMAIN"),
 		CookieSameSite: "None",
-		KeyLookup:      "cookie:blog-user-session",
+		KeyLookup:      "cookie:blog-userinfo-session",
 		// CookieHTTPOnly: true,
 	}) // blog user session
 }

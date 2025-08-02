@@ -7,19 +7,17 @@ import (
 )
 
 func ResponseFactory[T any](c *fiber.Ctx, httpStatus int, msg string, data *T) dto.CommonResponse[T] {
-	if httpStatus == 200 {
-		return dto.CommonResponse[T]{
-			StatusCode: httpStatus,
-			InfoMsg:    msg,
-			UserInfo:   c.Locals("user_info").(dto.UserInfo),
-			Data:       data,
-		}
-	} else {
-		return dto.CommonResponse[T]{
-			StatusCode: httpStatus,
-			ErrMsg:     msg,
-			UserInfo:   c.Locals("user_info").(dto.UserInfo),
-			Data:       data,
-		}
+	response := dto.CommonResponse[T]{}
+	userInfo, ok := c.Locals("user_info").(dto.UserInfo)
+	if ok {
+		response.UserInfo = &userInfo
 	}
+	response.StatusCode = httpStatus
+	response.Data = data
+	if httpStatus == 200 {
+		response.InfoMsg = msg
+	} else {
+		response.ErrMsg = msg
+	}
+	return response
 }

@@ -71,6 +71,22 @@ func Login(c *fiber.Ctx, store *session.Store, db *gorm.DB) error {
 				Avatar:     userData.Avatar,
 			}
 
+			// 如果有登入紀錄，因為有重查一次DB，所以更新一次資料以及版號
+			value, ok := middleware.UserInfo[userData.ID]
+			if ok {
+				value.Username = data.Username
+				value.Email = data.Email
+				value.Exp = data.Exp
+				value.Management = data.Management
+				value.CreatedAt = data.CreatedAt
+				value.UpdatedAt = data.UpdatedAt
+				value.UpdateName = data.UpdateName
+				data.Avatar = userData.Avatar
+				value.DataVersion++
+			} else {
+				middleware.UserInfo[userData.ID] = &data
+			}
+
 			setUserInfoSession(c, store, &data)
 
 			response := utils.ResponseFactory(c, fiber.StatusOK, fmt.Sprintf("使用者 %s 登入成功", data.Username), &data)
