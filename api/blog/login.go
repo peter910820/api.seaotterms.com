@@ -60,15 +60,16 @@ func Login(c *fiber.Ctx, store *session.Store, db *gorm.DB) error {
 			}
 
 			data := dto.UserInfo{
-				ID:         userData.ID,
-				Username:   userData.Username,
-				Email:      userData.Email,
-				Exp:        userData.Exp,
-				Management: userData.Management,
-				CreatedAt:  userData.CreatedAt,
-				UpdatedAt:  userData.UpdatedAt,
-				UpdateName: userData.UpdateName,
-				Avatar:     userData.Avatar,
+				ID:          userData.ID,
+				Username:    userData.Username,
+				Email:       userData.Email,
+				Exp:         userData.Exp,
+				Management:  userData.Management,
+				CreatedAt:   userData.CreatedAt,
+				UpdatedAt:   userData.UpdatedAt,
+				UpdateName:  userData.UpdateName,
+				Avatar:      userData.Avatar,
+				DataVersion: 1,
 			}
 
 			// 如果有登入紀錄，因為有重查一次DB，所以更新一次資料以及版號
@@ -87,9 +88,11 @@ func Login(c *fiber.Ctx, store *session.Store, db *gorm.DB) error {
 				middleware.UserInfo[userData.ID] = &data
 			}
 
+			c.Locals("user_info", middleware.UserInfo[userData.ID])
+
 			setUserInfoSession(c, store, &data)
 
-			response := utils.ResponseFactory(c, fiber.StatusOK, fmt.Sprintf("使用者 %s 登入成功", data.Username), &data)
+			response := utils.ResponseFactory[any](c, fiber.StatusOK, fmt.Sprintf("使用者 %s 登入成功", data.Username), nil)
 			return c.Status(fiber.StatusOK).JSON(response)
 		}
 	}

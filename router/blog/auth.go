@@ -13,7 +13,8 @@ import (
 func authRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
 	authGroup := blogGroup.Group("/auth")
 
-	authGroup.Get("/", middleware.CheckLogin(store, dbs[dbName]), func(c *fiber.Ctx) error {
+	// get user info
+	authGroup.Get("/", middleware.GetUserInfo(store, dbs[dbName]), func(c *fiber.Ctx) error {
 		return api.AuthLogin(c, store)
 	})
 	// check if you are the website owner
