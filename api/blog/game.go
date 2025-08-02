@@ -9,6 +9,7 @@ import (
 
 	dto "api.seaotterms.com/dto/blog"
 	model "api.seaotterms.com/model/galgame"
+	utils "api.seaotterms.com/utils/blog"
 )
 
 func QueryGame(c *fiber.Ctx, db *gorm.DB) error {
@@ -16,18 +17,14 @@ func QueryGame(c *fiber.Ctx, db *gorm.DB) error {
 
 	err := db.Order("COALESCE(updated_at, created_at) DESC").Find(&responseData).Error
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-			StatusCode: 500,
-			ErrMsg:     err.Error(),
-		})
+		logrus.Error(err)
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
 	logrus.Info("Game資料查詢成功")
-	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[[]model.Game]{
-		StatusCode: 200,
-		InfoMsg:    "Game資料查詢成功",
-		Data:       &responseData,
-	})
+	response := utils.ResponseFactory(c, fiber.StatusOK, "Game資料查詢成功", &responseData)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 func CreateGame(c *fiber.Ctx, db *gorm.DB) error {
@@ -35,10 +32,8 @@ func CreateGame(c *fiber.Ctx, db *gorm.DB) error {
 
 	if err := c.BodyParser(&requestData); err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusBadRequest).JSON(dto.CommonResponse[any]{
-			StatusCode: 400,
-			ErrMsg:     err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, err.Error(), nil)
+		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	err := db.First(&model.Game{}, requestData.BrandID).Error
@@ -46,15 +41,11 @@ func CreateGame(c *fiber.Ctx, db *gorm.DB) error {
 		logrus.Error(err)
 		// if record not exist
 		if err == gorm.ErrRecordNotFound {
-			return c.Status(fiber.StatusNotFound).JSON(dto.CommonResponse[any]{
-				StatusCode: 404,
-				ErrMsg:     "找不到Brand資料",
-			})
+			response := utils.ResponseFactory[any](c, fiber.StatusNotFound, "找不到Brand資料", nil)
+			return c.Status(fiber.StatusNotFound).JSON(response)
 		} else {
-			return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-				StatusCode: 500,
-				ErrMsg:     err.Error(),
-			})
+			response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+			return c.Status(fiber.StatusInternalServerError).JSON(response)
 		}
 	}
 
@@ -72,15 +63,11 @@ func CreateGame(c *fiber.Ctx, db *gorm.DB) error {
 
 	if err := db.Create(&data).Error; err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-			StatusCode: 500,
-			ErrMsg:     err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
 	logrus.Info("Galgame資料建立成功: " + requestData.Name)
-	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[any]{
-		StatusCode: 200,
-		InfoMsg:    "Galgame資料建立成功: " + requestData.Name,
-	})
+	response := utils.ResponseFactory[any](c, fiber.StatusOK, "Galgame資料建立成功: "+requestData.Name, nil)
+	return c.Status(fiber.StatusOK).JSON(response)
 }

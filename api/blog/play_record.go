@@ -5,8 +5,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 
-	dto "api.seaotterms.com/dto/blog"
 	model "api.seaotterms.com/model/galgame"
+	utils "api.seaotterms.com/utils/blog"
 )
 
 func QueryGameRecord(c *fiber.Ctx, db *gorm.DB) error {
@@ -14,16 +14,11 @@ func QueryGameRecord(c *fiber.Ctx, db *gorm.DB) error {
 
 	err := db.Order("COALESCE(updated_at, created_at) DESC").Find(&responseData).Error
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-			StatusCode: 500,
-			ErrMsg:     err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
 	logrus.Info("個人攻略Galgame攻略資料查詢成功")
-	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[[]model.PlayRecord]{
-		StatusCode: 200,
-		InfoMsg:    "個人攻略Galgame攻略資料查詢成功",
-		Data:       &responseData,
-	})
+	response := utils.ResponseFactory(c, fiber.StatusOK, "個人攻略Galgame攻略資料查詢成功", &responseData)
+	return c.Status(fiber.StatusOK).JSON(response)
 }

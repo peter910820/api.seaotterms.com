@@ -14,6 +14,7 @@ import (
 	dto "api.seaotterms.com/dto/blog"
 	middleware "api.seaotterms.com/middleware/blog"
 	model "api.seaotterms.com/model/blog"
+	utils "api.seaotterms.com/utils/blog"
 )
 
 func Login(c *fiber.Ctx, store *session.Store, db *gorm.DB) error {
@@ -22,18 +23,14 @@ func Login(c *fiber.Ctx, store *session.Store, db *gorm.DB) error {
 
 	if err := c.BodyParser(&data); err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusBadRequest).JSON(dto.CommonResponse[any]{
-			StatusCode: 400,
-			ErrMsg:     err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, err.Error(), nil)
+		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	err := db.Model(&model.User{}).Find(&databaseData).Error
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-			StatusCode: 500,
-			ErrMsg:     err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
 	data.Username = strings.ToLower(data.Username)
@@ -44,41 +41,25 @@ func Login(c *fiber.Ctx, store *session.Store, db *gorm.DB) error {
 			if err != nil {
 				if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 					logrus.Error("login error: password not correct")
-					return c.Status(fiber.StatusUnauthorized).JSON(dto.CommonResponse[any]{
-						StatusCode: 401,
-						ErrMsg:     "密碼輸入錯誤",
-					})
+					response := utils.ResponseFactory[any](c, fiber.StatusUnauthorized, "密碼輸入錯誤", nil)
+					return c.Status(fiber.StatusUnauthorized).JSON(response)
 				} else {
 					logrus.Error(err)
-					return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-						StatusCode: 500,
-						ErrMsg:     err.Error(),
-					})
+					response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+					return c.Status(fiber.StatusInternalServerError).JSON(response)
 				}
 			}
-			// set session
-			sess, err := store.Get(c)
-			if err != nil {
-				logrus.Fatal(err) // 這邊之後會發送訊息
-			}
-			sess.Set("username", data.Username)
-			if err := sess.Save(); err != nil {
-				logrus.Fatal(err) // 這邊之後會發送訊息
-			}
-			logrus.Infof("Username %s login success", data.Username)
 
 			var userData model.User
 
 			err = db.Where("username = ?", data.Username).First(&userData).Error
 			if err != nil {
 				logrus.Error(err)
-				return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-					StatusCode: 500,
-					ErrMsg:     err.Error(),
-				})
+				response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+				return c.Status(fiber.StatusInternalServerError).JSON(response)
 			}
 
-			data := middleware.UserData{
+			data := dto.UserInfo{
 				ID:         userData.ID,
 				Username:   userData.Username,
 				Email:      userData.Email,
@@ -90,16 +71,30 @@ func Login(c *fiber.Ctx, store *session.Store, db *gorm.DB) error {
 				Avatar:     userData.Avatar,
 			}
 
-			return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[middleware.UserData]{
-				StatusCode: 200,
-				InfoMsg:    fmt.Sprintf("SystemTodo %s 更新成功", c.Params("id")),
-				Data:       &data,
-			})
+			setUserInfoSession(c, store, &data)
+
+			response := utils.ResponseFactory(c, fiber.StatusOK, fmt.Sprintf("使用者 %s 登入成功", data.Username), &data)
+			return c.Status(fiber.StatusOK).JSON(response)
 		}
 	}
 	logrus.Error("user not found")
-	return c.Status(fiber.StatusUnauthorized).JSON(dto.CommonResponse[any]{
-		StatusCode: 401,
-		ErrMsg:     "找不到該使用者: " + data.Username,
-	})
+	response := utils.ResponseFactory[any](c, fiber.StatusUnauthorized, "找不到該使用者: "+data.Username, nil)
+	return c.Status(fiber.StatusUnauthorized).JSON(response)
+}
+
+func setUserInfoSession(c *fiber.Ctx, store *session.Store, userInfo *dto.UserInfo) {
+	// set session
+	sess, err := store.Get(c)
+	if err != nil {
+		logrus.Fatal(err) // 這邊之後會發送訊息
+	}
+
+	sess.Set("id", userInfo.ID)
+	if err := sess.Save(); err != nil {
+		logrus.Fatal(err) // 這邊之後會發送訊息
+	}
+
+	middleware.UserInfo[userInfo.ID] = userInfo
+
+	logrus.Infof("Username %s login success", userInfo.Username)
 }

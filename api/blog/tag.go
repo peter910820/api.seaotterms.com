@@ -9,6 +9,7 @@ import (
 
 	dto "api.seaotterms.com/dto/blog"
 	model "api.seaotterms.com/model/blog"
+	utils "api.seaotterms.com/utils/blog"
 )
 
 type TagData struct {
@@ -24,24 +25,17 @@ func QueryTag(c *fiber.Ctx, db *gorm.DB) error {
 		logrus.Error(err)
 		// if record not exist
 		if err == gorm.ErrRecordNotFound {
-			return c.Status(fiber.StatusNotFound).JSON(dto.CommonResponse[any]{
-				StatusCode: 404,
-				ErrMsg:     err.Error(),
-			})
+			response := utils.ResponseFactory[any](c, fiber.StatusNotFound, err.Error(), nil)
+			return c.Status(fiber.StatusNotFound).JSON(response)
 		} else {
-			return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-				StatusCode: 500,
-				ErrMsg:     err.Error(),
-			})
+			response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+			return c.Status(fiber.StatusInternalServerError).JSON(response)
 		}
 	}
 
 	logrus.Info("Tag資料查詢成功")
-	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[[]model.Tag]{
-		StatusCode: 200,
-		InfoMsg:    "Tag資料查詢成功",
-		Data:       &responseData,
-	})
+	response := utils.ResponseFactory(c, fiber.StatusOK, "Tag資料查詢成功", &responseData)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 func CreateTag(c *fiber.Ctx, db *gorm.DB) error {
@@ -50,9 +44,8 @@ func CreateTag(c *fiber.Ctx, db *gorm.DB) error {
 	// load client data
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err.Error())
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"msg": err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
 	dataCreate := model.Tag{
@@ -64,11 +57,9 @@ func CreateTag(c *fiber.Ctx, db *gorm.DB) error {
 	err := db.Create(&dataCreate).Error
 	if err != nil {
 		logrus.Println("錯誤:", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"msg": err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"msg": "成功建立Tag",
-	})
+	response := utils.ResponseFactory[any](c, fiber.StatusOK, "成功建立Tag", nil)
+	return c.Status(fiber.StatusOK).JSON(response)
 }

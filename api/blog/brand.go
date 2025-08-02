@@ -9,6 +9,7 @@ import (
 
 	dto "api.seaotterms.com/dto/blog"
 	model "api.seaotterms.com/model/galgame"
+	utils "api.seaotterms.com/utils/blog"
 )
 
 func QueryBrand(c *fiber.Ctx, db *gorm.DB) error {
@@ -16,18 +17,13 @@ func QueryBrand(c *fiber.Ctx, db *gorm.DB) error {
 
 	err := db.Order("COALESCE(updated_at, created_at) DESC").Find(&responseData).Error
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-			StatusCode: 500,
-			ErrMsg:     err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
 	logrus.Info("Brand資料查詢成功")
-	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[[]model.Brand]{
-		StatusCode: 200,
-		InfoMsg:    "Brand資料查詢成功",
-		Data:       &responseData,
-	})
+	response := utils.ResponseFactory(c, fiber.StatusOK, "Brand資料查詢成功", &responseData)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 func CreateBrand(c *fiber.Ctx, db *gorm.DB) error {
@@ -35,10 +31,8 @@ func CreateBrand(c *fiber.Ctx, db *gorm.DB) error {
 
 	if err := c.BodyParser(&requestData); err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusBadRequest).JSON(dto.CommonResponse[any]{
-			StatusCode: 400,
-			ErrMsg:     err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, err.Error(), nil)
+		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	data := model.Brand{
@@ -52,15 +46,11 @@ func CreateBrand(c *fiber.Ctx, db *gorm.DB) error {
 
 	if err := db.Create(&data).Error; err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-			StatusCode: 500,
-			ErrMsg:     err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
 	logrus.Info("Galgame品牌資料建立成功: " + requestData.Name)
-	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[any]{
-		StatusCode: 200,
-		InfoMsg:    "Galgame品牌資料建立成功: " + requestData.Name,
-	})
+	response := utils.ResponseFactory[any](c, fiber.StatusOK, "Galgame品牌資料建立成功: "+requestData.Name, nil)
+	return c.Status(fiber.StatusOK).JSON(response)
 }

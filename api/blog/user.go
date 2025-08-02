@@ -14,6 +14,7 @@ import (
 
 	dto "api.seaotterms.com/dto/blog"
 	model "api.seaotterms.com/model/blog"
+	utils "api.seaotterms.com/utils/blog"
 )
 
 type UserDataForUpdate struct {
@@ -33,19 +34,15 @@ func CreateUser(c *fiber.Ctx, db *gorm.DB) error {
 
 	if err := c.BodyParser(&data); err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusBadRequest).JSON(dto.CommonResponse[any]{
-			StatusCode: 400,
-			ErrMsg:     "客戶端資料錯誤",
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, "客戶端資料錯誤", nil)
+		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	err := db.Model(&model.User{}).Find(&find).Error
 	if err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-			StatusCode: 500,
-			ErrMsg:     err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusOK, fmt.Sprintf("Todo %s 刪除成功", c.Params("id")), nil)
+		return c.Status(fiber.StatusOK).JSON(response)
 	}
 
 	data.Username = strings.ToLower(data.Username)
@@ -53,24 +50,18 @@ func CreateUser(c *fiber.Ctx, db *gorm.DB) error {
 	// check Username & Email exist
 	for _, col := range find {
 		if data.Username == col.Username {
-			return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-				StatusCode: 500,
-				ErrMsg:     "用戶已註冊",
-			})
+			response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, "用戶已註冊", nil)
+			return c.Status(fiber.StatusInternalServerError).JSON(response)
 		} else if data.Email == col.Email {
-			return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-				StatusCode: 500,
-				ErrMsg:     "電子信箱已註冊",
-			})
+			response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, "電子信箱已註冊", nil)
+			return c.Status(fiber.StatusInternalServerError).JSON(response)
 		}
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
 	if err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-			StatusCode: 500,
-			ErrMsg:     err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 	data.Password = string(hashedPassword)
 	dataCreate := model.User{
@@ -82,16 +73,12 @@ func CreateUser(c *fiber.Ctx, db *gorm.DB) error {
 	err = db.Create(&dataCreate).Error
 	if err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-			StatusCode: 500,
-			ErrMsg:     err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[any]{
-		StatusCode: 200,
-		InfoMsg:    "註冊成功",
-	})
+	response := utils.ResponseFactory[any](c, fiber.StatusOK, "註冊成功", nil)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 func UpdateUser(c *fiber.Ctx, db *gorm.DB) error {
@@ -99,35 +86,27 @@ func UpdateUser(c *fiber.Ctx, db *gorm.DB) error {
 	var clientData dto.UserUpdateRequest
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusBadRequest).JSON(dto.CommonResponse[any]{
-			StatusCode: 400,
-			ErrMsg:     err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, err.Error(), nil)
+		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 	// URL decoding
 	id, err := url.QueryUnescape(c.Params("id"))
 	if err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusBadRequest).JSON(dto.CommonResponse[any]{
-			StatusCode: 400,
-			ErrMsg:     err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, err.Error(), nil)
+		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 	// check if form id equal route id
 	u, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-			StatusCode: 500,
-			ErrMsg:     err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 	if u != uint64(clientData.ID) {
 		logrus.Error("ID比對失敗")
-		return c.Status(fiber.StatusBadRequest).JSON(dto.CommonResponse[any]{
-			StatusCode: 400,
-			ErrMsg:     "ID比對失敗",
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, "ID比對失敗", nil)
+		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	err = db.Model(&model.User{}).Where("id = ?", id).
@@ -141,21 +120,15 @@ func UpdateUser(c *fiber.Ctx, db *gorm.DB) error {
 		// if record not exist
 		if err == gorm.ErrRecordNotFound {
 			logrus.Error(err)
-			return c.Status(fiber.StatusNotFound).JSON(dto.CommonResponse[any]{
-				StatusCode: 404,
-				ErrMsg:     "使用者不存在，更新使用者失敗",
-			})
+			response := utils.ResponseFactory[any](c, fiber.StatusNotFound, "使用者不存在，更新使用者失敗", nil)
+			return c.Status(fiber.StatusNotFound).JSON(response)
 		} else {
 			logrus.Error(err)
-			return c.Status(fiber.StatusInternalServerError).JSON(dto.CommonResponse[any]{
-				StatusCode: 500,
-				ErrMsg:     err.Error(),
-			})
+			response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+			return c.Status(fiber.StatusInternalServerError).JSON(response)
 		}
 	}
 	logrus.Infof("個人資料 %s 更新成功", clientData.Username)
-	return c.Status(fiber.StatusOK).JSON(dto.CommonResponse[any]{
-		StatusCode: 200,
-		InfoMsg:    fmt.Sprintf("資料 %s 更新成功", clientData.Username),
-	})
+	response := utils.ResponseFactory[any](c, fiber.StatusOK, fmt.Sprintf("資料 %s 更新成功", clientData.Username), nil)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
