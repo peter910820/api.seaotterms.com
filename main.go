@@ -24,7 +24,7 @@ var (
 		Expiration:     7 * 24 * time.Hour,
 		CookieDomain:   os.Getenv("SESSION_DOMAIN"),
 		CookieSameSite: "None",
-		KeyLookup:      "cookie:user-session",
+		KeyLookup:      "cookie:blog-user",
 		// CookieHTTPOnly: true,
 	})
 	// management database connect
