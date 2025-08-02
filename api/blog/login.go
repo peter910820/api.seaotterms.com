@@ -100,6 +100,6 @@ func Login(c *fiber.Ctx, store *session.Store, db *gorm.DB) error {
 	logrus.Error("user not found")
 	return c.Status(fiber.StatusUnauthorized).JSON(dto.CommonResponse[any]{
 		StatusCode: 401,
-		InfoMsg:    "找不到該使用者: " + data.Username,
+		ErrMsg:     "找不到該使用者: " + data.Username,
 	})
 }
