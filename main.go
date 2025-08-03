@@ -63,10 +63,6 @@ func main() {
 		AllowHeaders:     "Origin,Content-Type,Accept",
 		AllowCredentials: true,
 	}))
-	logrus.Println("Session config:", session.Config{
-		CookieSecure:   false,
-		CookieSameSite: "None",
-	})
 	// api route group
 	apiGroup := app.Group("/api") // main api route group
 
