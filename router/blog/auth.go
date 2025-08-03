@@ -15,13 +15,14 @@ func authRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, 
 
 	// get user info
 	authGroup.Get("/", middleware.GetUserInfo(store, dbs[dbName]), func(c *fiber.Ctx) error {
-		return api.AuthLogin(c, store)
+		return api.Auth(c, store)
 	})
 	// check if you are the website owner
 	authGroup.Get("/root", middleware.CheckOwner(store, dbs[dbName]), func(c *fiber.Ctx) error {
-		return api.AuthLogin(c, store)
+		return api.Auth(c, store)
 	})
-	// authGroup.Get("/specific", middleware.CheckLogin(store, dbs[dbName]), func(c *fiber.Ctx) error {
-	// 	return api.AuthLogin(c, store)
-	// })
+
+	authGroup.Post("/login", func(c *fiber.Ctx) error {
+		return api.Login(c, store, dbs[dbName])
+	})
 }

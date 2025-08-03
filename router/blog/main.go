@@ -25,7 +25,6 @@ func BlogRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, store *session.S
 
 	todoRouter(blogGroup, dbs, dbName, store)
 	systemTodoRouter(blogGroup, dbs, dbName, store)
-	authRouter(blogGroup, dbs, dbName, store)
 	userRouter(blogGroup, dbs, dbName, store)
 	todoTopicRouter(blogGroup, dbs, dbName, store)
 
@@ -35,6 +34,6 @@ func BlogRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, store *session.S
 	brandRouter(blogGroup, dbs, dbName2, store)
 	gameRouter(blogGroup, dbs, dbName2, store)
 
-	// login
-	loginRouter(blogGroup, dbs, dbName, store)
+	// auth
+	authRouter(blogGroup, dbs, dbName, store)
 }
