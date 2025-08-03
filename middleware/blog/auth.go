@@ -31,7 +31,7 @@ func init() {
 	authDbName = os.Getenv("DATABASE_NAME3")
 }
 
-// 用Token檢查使用者資料(預設全域註冊、回傳)
+// 用Token檢查使用者資料(預設前端全域註冊、回傳)
 func GetUserInfo(store *session.Store, db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		sess, err := store.Get(c)
@@ -51,7 +51,7 @@ func GetUserInfo(store *session.Store, db *gorm.DB) fiber.Handler {
 	}
 }
 
-// 檢查有無登入
+// 檢查有無登入，沒登入直接中止API並回傳錯誤
 func CheckLogin(store *session.Store, db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		userInfo, err := checkLogin(c, store)
@@ -65,7 +65,7 @@ func CheckLogin(store *session.Store, db *gorm.DB) fiber.Handler {
 	}
 }
 
-// 檢查是不是網站管理者
+// 檢查是不是網站管理者，沒登入直接中止API並回傳錯誤
 func CheckOwner(store *session.Store, db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.Next()
@@ -80,12 +80,12 @@ func checkLogin(c *fiber.Ctx, store *session.Store) (*dto.UserInfo, error) {
 	}
 	userID := sess.Get("id")
 	if userID == nil {
-		return nil, errors.New("visitors is not logged in")
+		return nil, errors.New("使用者未登入")
 	}
 
 	userInfo, ok := UserInfo[userID.(uint)]
 	if !ok {
-		return nil, errors.New("visitors is not logged in")
+		return nil, errors.New("使用者未登入")
 	}
 
 	return userInfo, nil
