@@ -8,11 +8,13 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
 	dto "api.seaotterms.com/dto/blog"
+	middleware "api.seaotterms.com/middleware/blog"
 	model "api.seaotterms.com/model/blog"
 	utils "api.seaotterms.com/utils/blog"
 )
@@ -81,7 +83,7 @@ func CreateUser(c *fiber.Ctx, db *gorm.DB) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
-func UpdateUser(c *fiber.Ctx, db *gorm.DB) error {
+func UpdateUser(c *fiber.Ctx, db *gorm.DB, store *session.Store) error {
 	// load client data
 	var clientData dto.UserUpdateRequest
 	if err := c.BodyParser(&clientData); err != nil {
@@ -108,11 +110,11 @@ func UpdateUser(c *fiber.Ctx, db *gorm.DB) error {
 		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, "ID比對失敗", nil)
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
-
+	timeNow := time.Now()
 	err = db.Model(&model.User{}).Where("id = ?", id).
 		Select("updated_at", "update_name", "avatar").
 		Updates(UserDataForUpdate{
-			UpdatedAt:  time.Now(),
+			UpdatedAt:  timeNow,
 			UpdateName: clientData.Username,
 			Avatar:     clientData.Avatar,
 		}).Error
@@ -128,6 +130,30 @@ func UpdateUser(c *fiber.Ctx, db *gorm.DB) error {
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
 		}
 	}
+	// 更新使用者資料成功，更新快取表
+	userInfo, ok := middleware.UserInfo[clientData.ID]
+	if !ok {
+		logrus.Error("快取表更新失敗")
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, "快取表更新失敗", nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+	userInfo.UpdatedAt = timeNow
+	userInfo.UpdateName = clientData.Username
+	userInfo.Avatar = clientData.Avatar
+	userInfo.DataVersion++
+
+	// 更新response UserInfo
+	sess, err := store.Get(c)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	userID := sess.Get("id")
+	if userID == nil {
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, "上下文資料更新失敗", nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+	c.Locals("user_info", userInfo)
+
 	logrus.Infof("個人資料 %s 更新成功", clientData.Username)
 	response := utils.ResponseFactory[any](c, fiber.StatusOK, fmt.Sprintf("資料 %s 更新成功", clientData.Username), nil)
 	return c.Status(fiber.StatusOK).JSON(response)
