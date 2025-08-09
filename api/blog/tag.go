@@ -12,11 +12,6 @@ import (
 	utils "api.seaotterms.com/utils/blog"
 )
 
-type TagData struct {
-	ID    uint
-	Title string
-}
-
 func QueryTag(c *fiber.Ctx, db *gorm.DB) error {
 	var responseData []model.Tag
 

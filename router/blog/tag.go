@@ -18,6 +18,7 @@ func tagRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
 		return api.QueryArticleForTag(c, dbs[dbName])
 	})
 
+	// create tag
 	tagGroup.Post("/", func(c *fiber.Ctx) error {
 		return api.CreateTag(c, dbs[dbName])
 	})
