@@ -69,6 +69,7 @@ type PlayRecord struct {
 	UpdatedAt            time.Time `json:"updatedAt"`
 }
 
+// 舊系統(使用中)
 // galgame brand record schema
 type BrandRecord struct {
 	Brand       string    `gorm:"primaryKey" json:"brand"`          // PK
@@ -82,6 +83,7 @@ type BrandRecord struct {
 	UpdateName  string    `gorm:"not null" json:"updateName"`       // UpdateName
 }
 
+// 舊系統(使用中)
 // galgame game record schema
 type GameRecord struct {
 	Name        string    `gorm:"primaryKey" json:"name"`           // PK
