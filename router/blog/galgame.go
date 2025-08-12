@@ -15,7 +15,7 @@ func GalgameRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName strin
 	galgameGroup := blogGroup.Group("/galgames")
 
 	galgameGroup.Get("/s/:name", middleware.CheckLogin(store, dbs[dbName]), func(c *fiber.Ctx) error {
-		return api.QueryGalgame(c, dbs[os.Getenv("DB_NAME2")])
+		return api.QueryGalgame(c, dbs[dbName])
 	})
 	galgameGroup.Get("/:brand", func(c *fiber.Ctx) error {
 		return api.QueryGalgameByBrand(c, dbs[dbName])

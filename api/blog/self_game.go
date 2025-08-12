@@ -52,6 +52,7 @@ func QueryGalgame(c *fiber.Ctx, db *gorm.DB) error {
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
 		}
 	}
+
 	logrus.Info("Galgame單筆資料查詢成功")
 	response := utils.ResponseFactory(c, fiber.StatusOK, "Galgame單筆資料查詢成功", &data)
 	return c.Status(fiber.StatusOK).JSON(response)
