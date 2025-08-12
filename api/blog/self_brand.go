@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 
 	model "api.seaotterms.com/model/galgame"
+	utils "api.seaotterms.com/utils/blog"
 )
 
 type BrandRecordForClient struct {
@@ -34,17 +35,15 @@ type BrandRecordForUpdate struct {
 func QueryAllGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
 	var data []model.BrandRecord
 
-	r := db.Order("update_time DESC").Find(&data)
-	if r.Error != nil {
-		logrus.Error(r.Error)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"msg": r.Error.Error(),
-		})
+	err := db.Order("update_time DESC").Find(&data).Error
+	if err != nil {
+		logrus.Error(err)
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 	logrus.Info("GalgameBrand全部資料查詢成功")
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"data": data,
-	})
+	response := utils.ResponseFactory(c, fiber.StatusOK, "GalgameBrand全部資料查詢成功", &data)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 // use brand name to query single galgamebrand data
@@ -54,27 +53,25 @@ func QueryGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
 	brand, err := url.QueryUnescape(c.Params("brand"))
 	if err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"msg": err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, err.Error(), nil)
+		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	r := db.Where("brand = ?", brand).First(&data)
-	if r.Error != nil {
+	err = db.Where("brand = ?", brand).First(&data).Error
+	if err != nil {
+		logrus.Error(err)
 		// if record not exist
-		if r.Error == gorm.ErrRecordNotFound {
-			logrus.Error(r.Error)
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"msg": r.Error.Error(),
-			})
+		if err == gorm.ErrRecordNotFound {
+			response := utils.ResponseFactory[any](c, fiber.StatusNotFound, "找不到Brand資料", nil)
+			return c.Status(fiber.StatusNotFound).JSON(response)
 		} else {
-			logrus.Fatal(r.Error.Error())
+			response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+			return c.Status(fiber.StatusInternalServerError).JSON(response)
 		}
 	}
 	logrus.Info("GalgameBrand單筆資料查詢成功")
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"data": data,
-	})
+	response := utils.ResponseFactory(c, fiber.StatusOK, "GalgameBrand單筆資料查詢成功", &data)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 // insert data to galgamebrand
@@ -83,9 +80,8 @@ func CreateGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
 	var clientData BrandRecordForClient
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"msg": err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, err.Error(), nil)
+		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	annotation := "待攻略"
@@ -102,17 +98,15 @@ func CreateGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
 		InputName:   clientData.Username,
 		UpdateName:  clientData.Username,
 	}
-	r := db.Create(&data)
-	if r.Error != nil {
-		logrus.Error(r.Error)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"msg": r.Error.Error(),
-		})
+	err := db.Create(&data).Error
+	if err != nil {
+		logrus.Error(err)
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 	logrus.Infof("資料 %s 創建成功", clientData.Brand)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"msg": fmt.Sprintf("資料 %s 創建成功", clientData.Brand),
-	})
+	response := utils.ResponseFactory[any](c, fiber.StatusOK, fmt.Sprintf("資料 %s 創建成功", clientData.Brand), nil)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 // update single galgamebrand data
@@ -121,17 +115,15 @@ func UpdateGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
 	var clientData BrandRecordForClient
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"msg": err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, err.Error(), nil)
+		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 	// URL decoding
 	brand, err := url.QueryUnescape(c.Params("brand"))
 	if err != nil {
 		logrus.Error(err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"msg": err.Error(),
-		})
+		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, err.Error(), nil)
+		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	annotation := "待攻略"
@@ -140,7 +132,7 @@ func UpdateGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
 	}
 
 	// gorm:"autoUpdateTime" can not update, so manual update update_time
-	r := db.Model(&model.BrandRecord{}).Where("brand = ?", brand).
+	err = db.Model(&model.BrandRecord{}).Where("brand = ?", brand).
 		Select("brand", "completed", "total", "annotation", "dissolution", "update_name", "update_time").
 		Updates(BrandRecordForUpdate{
 			Brand:       clientData.Brand,
@@ -150,20 +142,20 @@ func UpdateGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
 			Dissolution: clientData.Dissolution,
 			UpdateName:  clientData.Username,
 			UpdateTime:  time.Now(),
-		})
-	if r.Error != nil {
+		}).Error
+	if err != nil {
+		logrus.Error(err)
 		// if record not exist
-		if r.Error == gorm.ErrRecordNotFound {
-			logrus.Errorf("%s\n", r.Error.Error())
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"msg": r.Error.Error(),
-			})
+		if err == gorm.ErrRecordNotFound {
+			response := utils.ResponseFactory[any](c, fiber.StatusNotFound, "找不到Brand資料", nil)
+			return c.Status(fiber.StatusNotFound).JSON(response)
 		} else {
-			logrus.Fatal(r.Error.Error())
+			response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+			return c.Status(fiber.StatusInternalServerError).JSON(response)
 		}
 	}
 	logrus.Infof("資料 %s 更新成功", brand)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"msg": fmt.Sprintf("資料 %s 更新成功", brand),
-	})
+	response := utils.ResponseFactory[any](c, fiber.StatusOK, fmt.Sprintf("資料 %s 更新成功", brand), nil)
+	return c.Status(fiber.StatusOK).JSON(response)
+
 }

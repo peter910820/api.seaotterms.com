@@ -21,8 +21,8 @@ func QueryArticle(c *fiber.Ctx, db *gorm.DB) error {
 	articleID, err := url.QueryUnescape(c.Params("id"))
 	if err != nil {
 		logrus.Error(err)
-		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
-		return c.Status(fiber.StatusInternalServerError).JSON(response)
+		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, err.Error(), nil)
+		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	if articleID != "" {

@@ -41,7 +41,7 @@ func QuerySystemTodo(c *fiber.Ctx, db *gorm.DB) error {
 		}
 	}
 	logrus.Info("查詢SystemTodo資料成功")
-	response := utils.ResponseFactory(c, fiber.StatusOK, "查詢SystemTodo資料成功:", &data)
+	response := utils.ResponseFactory(c, fiber.StatusOK, "查詢SystemTodo資料成功", &data)
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
