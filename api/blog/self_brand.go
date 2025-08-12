@@ -33,7 +33,7 @@ type BrandRecordForUpdate struct {
 
 // query all galgamebrand data
 func QueryAllGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
-	var data []model.BrandRecord
+	var data []model.SelfBrand
 
 	err := db.Order("update_time DESC").Find(&data).Error
 	if err != nil {
@@ -48,7 +48,7 @@ func QueryAllGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
 
 // use brand name to query single galgamebrand data
 func QueryGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
-	var data []model.BrandRecord
+	var data []model.SelfBrand
 	// URL decoding
 	brand, err := url.QueryUnescape(c.Params("brand"))
 	if err != nil {
@@ -89,7 +89,7 @@ func CreateGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
 		annotation = "制霸"
 	}
 
-	data := model.BrandRecord{
+	data := model.SelfBrand{
 		Brand:       clientData.Brand,
 		Completed:   clientData.Completed,
 		Total:       clientData.Total,
@@ -132,7 +132,7 @@ func UpdateGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
 	}
 
 	// gorm:"autoUpdateTime" can not update, so manual update update_time
-	err = db.Model(&model.BrandRecord{}).Where("brand = ?", brand).
+	err = db.Model(&model.SelfBrand{}).Where("brand = ?", brand).
 		Select("brand", "completed", "total", "annotation", "dissolution", "update_name", "update_time").
 		Updates(BrandRecordForUpdate{
 			Brand:       clientData.Brand,

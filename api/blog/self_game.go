@@ -31,7 +31,7 @@ type GameRecordForUpdate struct {
 
 // use game name to query single galgame data
 func QueryGalgame(c *fiber.Ctx, db *gorm.DB) error {
-	var data []model.GameRecord
+	var data []model.SelfGame
 	// URL decoding
 	name, err := url.QueryUnescape(c.Params("name"))
 	if err != nil {
@@ -60,7 +60,7 @@ func QueryGalgame(c *fiber.Ctx, db *gorm.DB) error {
 
 // get all the galgame data for specify brand
 func QueryGalgameByBrand(c *fiber.Ctx, db *gorm.DB) error {
-	var data []model.GameRecord
+	var data []model.SelfGame
 	// URL decoding
 	brand, err := url.QueryUnescape(c.Params("brand"))
 	if err != nil {
@@ -98,7 +98,7 @@ func UpdateGalgameDevelop(c *fiber.Ctx, db *gorm.DB) error {
 	}
 
 	// gorm:"autoUpdateTime" can not update, so manual update update_time
-	err = db.Model(&model.GameRecord{}).Where("name = ?", name).
+	err = db.Model(&model.SelfGame{}).Where("name = ?", name).
 		Select("release_date", "end_date", "update_name", "update_time").
 		Updates(GameRecordForUpdate{
 			ReleaseDate: clientData.ReleaseDate,
@@ -132,7 +132,7 @@ func CreateGalgame(c *fiber.Ctx, db *gorm.DB) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	data := model.GameRecord{
+	data := model.SelfGame{
 		Name:        clientData.Name,
 		Brand:       clientData.Brand,
 		ReleaseDate: clientData.ReleaseDate,
@@ -153,7 +153,7 @@ func CreateGalgame(c *fiber.Ctx, db *gorm.DB) error {
 	/* --------------------------------- */
 
 	// update brand info
-	var brandData model.BrandRecord
+	var brandData model.SelfBrand
 
 	err = db.Where("brand = ?", clientData.Brand).First(&brandData).Error
 	if err != nil {
@@ -174,7 +174,7 @@ func CreateGalgame(c *fiber.Ctx, db *gorm.DB) error {
 	}
 
 	// gorm:"autoUpdateTime" can not update, so manual update update_time
-	err = db.Model(&model.BrandRecord{}).Where("brand = ?", clientData.Brand).
+	err = db.Model(&model.SelfBrand{}).Where("brand = ?", clientData.Brand).
 		Select("completed", "annotation", "update_name", "update_time").
 		Updates(BrandRecordForUpdate{
 			Completed:  brandData.Completed + 1,

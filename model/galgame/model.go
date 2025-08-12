@@ -71,7 +71,7 @@ type PlayRecord struct {
 
 // 舊系統(使用中)
 // galgame brand record schema
-type BrandRecord struct {
+type SelfBrand struct {
 	Brand       string    `gorm:"primaryKey" json:"brand"`          // PK
 	Completed   int       `gorm:"not null" json:"completed"`        // Completed game amount
 	Total       int       `gorm:"not null" json:"total"`            // Total game amount
@@ -85,7 +85,7 @@ type BrandRecord struct {
 
 // 舊系統(使用中)
 // galgame game record schema
-type GameRecord struct {
+type SelfGame struct {
 	Name        string    `gorm:"primaryKey" json:"name"`           // PK
 	Brand       string    `gorm:"not null" json:"brand"`            // Brand
 	ReleaseDate time.Time `gorm:"not null" json:"releaseDate"`      // ReleaseDate

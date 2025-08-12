@@ -29,8 +29,8 @@ func Migration(dbName string, db *gorm.DB) {
 		db.AutoMigrate(&galmodel.Brand{})
 		db.AutoMigrate(&galmodel.Game{})
 		db.AutoMigrate(&galmodel.PlayRecord{})
-		db.AutoMigrate(&galmodel.BrandRecord{}) // old
-		db.AutoMigrate(&galmodel.GameRecord{})  //old
+		db.AutoMigrate(&galmodel.SelfBrand{}) // old
+		db.AutoMigrate(&galmodel.SelfGame{})  //old
 		db.AutoMigrate(&galmodel.User{})
 		db.AutoMigrate(&galmodel.Tag{})
 		db.AutoMigrate(&galmodel.Article{})
