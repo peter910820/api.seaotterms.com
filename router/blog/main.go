@@ -29,8 +29,10 @@ func BlogRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, store *session.S
 	todoTopicRouter(blogGroup, dbs, dbName, store)
 
 	// galgame
-	selfGalgameRouter(blogGroup, dbs, dbName2, store)
-	selfGalgameBrandRouter(blogGroup, dbs, dbName2, store)
+	selfGameRouter(blogGroup, dbs, dbName2, store)
+	selfBrandRouter(blogGroup, dbs, dbName2, store)
+
+	// new galgame
 	brandRouter(blogGroup, dbs, dbName2, store)
 	gameRouter(blogGroup, dbs, dbName2, store)
 

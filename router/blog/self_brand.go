@@ -9,19 +9,19 @@ import (
 	middleware "api.seaotterms.com/middleware/blog"
 )
 
-func selfGalgameBrandRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
-	galgameBrandGroup := blogGroup.Group("/self-galgamebrands")
+func selfBrandRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
+	selfBrandGroup := blogGroup.Group("/self-galgamebrands")
 
-	galgameBrandGroup.Get("/", func(c *fiber.Ctx) error {
+	selfBrandGroup.Get("/", func(c *fiber.Ctx) error {
 		return api.QueryAllGalgameBrand(c, dbs[dbName])
 	})
-	galgameBrandGroup.Get("/:brand", func(c *fiber.Ctx) error {
+	selfBrandGroup.Get("/:brand", func(c *fiber.Ctx) error {
 		return api.QueryGalgameBrand(c, dbs[dbName])
 	})
-	galgameBrandGroup.Post("/", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
+	selfBrandGroup.Post("/", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
 		return api.CreateGalgameBrand(c, dbs[dbName])
 	})
-	galgameBrandGroup.Patch("/:brand", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
+	selfBrandGroup.Patch("/:brand", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
 		return api.UpdateGalgameBrand(c, dbs[dbName])
 	})
 }

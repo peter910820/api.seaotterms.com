@@ -9,19 +9,19 @@ import (
 	middleware "api.seaotterms.com/middleware/blog"
 )
 
-func selfGalgameRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
-	galgameGroup := blogGroup.Group("/self-galgames")
+func selfGameRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
+	selfGameGroup := blogGroup.Group("/self-galgames")
 
-	galgameGroup.Get("/s/:name", func(c *fiber.Ctx) error {
+	selfGameGroup.Get("/s/:name", func(c *fiber.Ctx) error {
 		return api.QueryGalgame(c, dbs[dbName])
 	})
-	galgameGroup.Get("/:brand", func(c *fiber.Ctx) error {
+	selfGameGroup.Get("/:brand", func(c *fiber.Ctx) error {
 		return api.QueryGalgameByBrand(c, dbs[dbName])
 	})
-	galgameGroup.Patch("/develop/:name", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
+	selfGameGroup.Patch("/develop/:name", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
 		return api.UpdateGalgameDevelop(c, dbs[dbName])
 	})
-	galgameGroup.Post("/", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
+	selfGameGroup.Post("/", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
 		return api.CreateGalgame(c, dbs[dbName])
 	})
 }
