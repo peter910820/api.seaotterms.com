@@ -100,7 +100,7 @@ func UpdateGalgameDevelop(c *fiber.Ctx, db *gorm.DB) error {
 
 	// gorm:"autoUpdateTime" can not update, so manual update update_time
 	err = db.Model(&model.SelfGame{}).Where("name = ?", name).
-		Select("release_date", "end_date", "all_age", "update_name", "update_time").
+		Select("release_date", "end_date", "all_ages", "update_name", "update_time").
 		Updates(GameRecordForUpdate{
 			ReleaseDate: clientData.ReleaseDate,
 			EndDate:     clientData.EndDate,
