@@ -76,7 +76,7 @@ func QueryGalgameByBrand(c *fiber.Ctx, db *gorm.DB) error {
 	}
 	// if data not exist, retrun a empty struct
 	logrus.Info("Galgame多筆資料查詢成功")
-	response := utils.ResponseFactory[any](c, fiber.StatusOK, "Galgame多筆資料查詢成功", nil)
+	response := utils.ResponseFactory(c, fiber.StatusOK, "Galgame多筆資料查詢成功", &data)
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
