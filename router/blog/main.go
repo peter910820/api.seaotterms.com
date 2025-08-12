@@ -17,11 +17,11 @@ func BlogRouter(apiGroup fiber.Router, dbs map[string]*gorm.DB, store *session.S
 	dbName := os.Getenv("DATABASE_NAME3")
 	dbName2 := os.Getenv("DATABASE_NAME2") // galgame DB
 
-	blogGroup.Use(middleware.GetUserInfo(store, dbs[dbName]))
+	blogGroup.Use(middleware.GetUserInfo(store)) // global middleware
 
 	// article
-	articleRouter(blogGroup, dbs, dbName)
-	tagRouter(blogGroup, dbs, dbName)
+	articleRouter(blogGroup, dbs, dbName, store)
+	tagRouter(blogGroup, dbs, dbName, store)
 
 	todoRouter(blogGroup, dbs, dbName, store)
 	systemTodoRouter(blogGroup, dbs, dbName, store)

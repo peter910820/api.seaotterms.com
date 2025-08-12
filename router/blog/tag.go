@@ -2,12 +2,14 @@ package blog
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
 	"gorm.io/gorm"
 
 	api "api.seaotterms.com/api/blog"
+	middleware "api.seaotterms.com/middleware/blog"
 )
 
-func tagRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
+func tagRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
 	tagGroup := blogGroup.Group("/tags")
 
 	tagGroup.Get("/", func(c *fiber.Ctx) error {
@@ -19,7 +21,7 @@ func tagRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string) {
 	})
 
 	// create tag
-	tagGroup.Post("/", func(c *fiber.Ctx) error {
+	tagGroup.Post("/", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
 		return api.CreateTag(c, dbs[dbName])
 	})
 }

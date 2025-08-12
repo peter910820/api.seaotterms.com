@@ -15,7 +15,7 @@ func todoTopicRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName str
 	todoTopicGroup.Get("/:owner", func(c *fiber.Ctx) error {
 		return api.QueryTodoTopic(c, dbs[dbName])
 	})
-	todoTopicGroup.Post("/", middleware.CheckLogin(store, dbs[dbName]), func(c *fiber.Ctx) error {
+	todoTopicGroup.Post("/", middleware.CheckLogin(store), func(c *fiber.Ctx) error {
 		return api.CreateTodoTopic(c, dbs[dbName])
 	})
 }

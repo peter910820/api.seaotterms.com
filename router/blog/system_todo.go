@@ -16,20 +16,20 @@ func systemTodoRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName st
 		return api.QuerySystemTodo(c, dbs[dbName])
 	})
 
-	systemTodoGroup.Post("/", middleware.CheckLogin(store, dbs[dbName]), func(c *fiber.Ctx) error {
+	systemTodoGroup.Post("/", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
 		return api.CreateSystemTodo(c, dbs[dbName])
 	})
 
-	systemTodoGroup.Patch("/:id", middleware.CheckOwner(store, dbs[dbName]), func(c *fiber.Ctx) error {
+	systemTodoGroup.Patch("/:id", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
 		return api.UpdateSystemTodo(c, dbs[dbName])
 	})
 
 	// quick update
-	systemTodoGroup.Patch("/quick/:id", middleware.CheckOwner(store, dbs[dbName]), func(c *fiber.Ctx) error {
+	systemTodoGroup.Patch("/quick/:id", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
 		return api.QuickUpdateSystemTodo(c, dbs[dbName])
 	})
 
-	systemTodoGroup.Delete("/:id", middleware.CheckOwner(store, dbs[dbName]), func(c *fiber.Ctx) error {
+	systemTodoGroup.Delete("/:id", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
 		return api.DeleteSystemTodo(c, dbs[dbName])
 	})
 }

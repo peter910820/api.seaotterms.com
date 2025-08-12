@@ -15,13 +15,13 @@ func todoRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, 
 	todoGroup.Get("/:owner", func(c *fiber.Ctx) error {
 		return api.QueryTodoByOwner(c, dbs[dbName])
 	})
-	todoGroup.Post("/", middleware.CheckLogin(store, dbs[dbName]), func(c *fiber.Ctx) error {
+	todoGroup.Post("/", middleware.CheckLogin(store), func(c *fiber.Ctx) error {
 		return api.CreateTodo(c, dbs[dbName])
 	})
-	todoGroup.Patch("/:id", middleware.CheckLogin(store, dbs[dbName]), func(c *fiber.Ctx) error {
+	todoGroup.Patch("/:id", middleware.CheckLogin(store), func(c *fiber.Ctx) error {
 		return api.UpdateTodoStatus(c, dbs[dbName])
 	})
-	todoGroup.Delete("/:id", middleware.CheckLogin(store, dbs[dbName]), func(c *fiber.Ctx) error {
+	todoGroup.Delete("/:id", middleware.CheckLogin(store), func(c *fiber.Ctx) error {
 		return api.DeleteTodo(c, dbs[dbName])
 	})
 }

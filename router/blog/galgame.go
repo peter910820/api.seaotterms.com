@@ -1,8 +1,6 @@
 package blog
 
 import (
-	"os"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"gorm.io/gorm"
@@ -14,16 +12,16 @@ import (
 func GalgameRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
 	galgameGroup := blogGroup.Group("/galgames")
 
-	galgameGroup.Get("/s/:name", middleware.CheckLogin(store, dbs[dbName]), func(c *fiber.Ctx) error {
+	galgameGroup.Get("/s/:name", func(c *fiber.Ctx) error {
 		return api.QueryGalgame(c, dbs[dbName])
 	})
 	galgameGroup.Get("/:brand", func(c *fiber.Ctx) error {
 		return api.QueryGalgameByBrand(c, dbs[dbName])
 	})
-	galgameGroup.Patch("/develop/:name", middleware.CheckOwner(store, dbs[os.Getenv("DB_NAME")]), func(c *fiber.Ctx) error {
+	galgameGroup.Patch("/develop/:name", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
 		return api.UpdateGalgameDevelop(c, dbs[dbName])
 	})
-	galgameGroup.Post("/", middleware.CheckOwner(store, dbs[os.Getenv("DB_NAME")]), func(c *fiber.Ctx) error {
+	galgameGroup.Post("/", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
 		return api.CreateGalgame(c, dbs[dbName])
 	})
 }

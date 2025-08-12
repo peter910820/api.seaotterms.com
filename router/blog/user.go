@@ -15,7 +15,7 @@ func userRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, 
 	userGroup.Post("/", func(c *fiber.Ctx) error {
 		return api.CreateUser(c, dbs[dbName])
 	})
-	userGroup.Patch("/:id", middleware.CheckLogin(store, dbs[dbName]), func(c *fiber.Ctx) error {
+	userGroup.Patch("/:id", middleware.CheckLogin(store), func(c *fiber.Ctx) error {
 		return api.UpdateUser(c, dbs[dbName], store)
 	})
 }
