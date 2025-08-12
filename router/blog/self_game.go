@@ -9,8 +9,8 @@ import (
 	middleware "api.seaotterms.com/middleware/blog"
 )
 
-func GalgameRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
-	galgameGroup := blogGroup.Group("/galgames")
+func selfGalgameRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
+	galgameGroup := blogGroup.Group("/self-galgames")
 
 	galgameGroup.Get("/s/:name", func(c *fiber.Ctx) error {
 		return api.QueryGalgame(c, dbs[dbName])
