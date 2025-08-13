@@ -117,6 +117,23 @@ type UserUpdateRequest struct {
 	Avatar     string    `json:"avatar"`
 }
 
+type SelfBrandUpdateRequest struct {
+	Brand       string `json:"brand"`
+	Username    string `json:"username"`
+	Completed   int    `json:"completed"`
+	Total       int    `json:"total"`
+	Dissolution bool   `json:"dissolution"`
+}
+
+type SelfGameUpdateRequest struct {
+	Name        string    `json:"name"`
+	Brand       string    `json:"brand"`
+	ReleaseDate time.Time `json:"releaseDate"`
+	AllAges     bool      `json:"allAges"`
+	EndDate     time.Time `json:"endDate"`
+	Username    string    `json:"username"`
+}
+
 // login
 type LoginRequest struct {
 	Username string `json:"username"`

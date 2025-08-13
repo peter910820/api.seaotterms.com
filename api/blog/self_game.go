@@ -9,18 +9,10 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 
+	dto "api.seaotterms.com/dto/blog"
 	model "api.seaotterms.com/model/galgame"
 	utils "api.seaotterms.com/utils/blog"
 )
-
-type GameRecordForClient struct {
-	Name        string    `json:"name"`
-	Brand       string    `json:"brand"`
-	ReleaseDate time.Time `json:"releaseDate"`
-	AllAges     bool      `json:"allAges"`
-	EndDate     time.Time `json:"endDate"`
-	Username    string    `json:"username"`
-}
 
 type GameRecordForUpdate struct {
 	ReleaseDate time.Time
@@ -84,7 +76,7 @@ func QueryGalgameByBrand(c *fiber.Ctx, db *gorm.DB) error {
 // update single galgame data (develop)
 func UpdateGalgameDevelop(c *fiber.Ctx, db *gorm.DB) error {
 	// load client data
-	var clientData GameRecordForClient
+	var clientData dto.SelfGameUpdateRequest
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err)
 		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, err.Error(), nil)
@@ -127,7 +119,7 @@ func UpdateGalgameDevelop(c *fiber.Ctx, db *gorm.DB) error {
 // insert data to galgame
 func CreateGalgame(c *fiber.Ctx, db *gorm.DB) error {
 	// load client data
-	var clientData GameRecordForClient
+	var clientData dto.SelfGameUpdateRequest
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err)
 		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, err.Error(), nil)

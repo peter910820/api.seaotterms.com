@@ -9,17 +9,10 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 
+	dto "api.seaotterms.com/dto/blog"
 	model "api.seaotterms.com/model/galgame"
 	utils "api.seaotterms.com/utils/blog"
 )
-
-type BrandRecordForClient struct {
-	Brand       string `json:"brand"`
-	Username    string `json:"username"`
-	Completed   int    `json:"completed"`
-	Total       int    `json:"total"`
-	Dissolution bool   `json:"dissolution"`
-}
 
 type BrandRecordForUpdate struct {
 	Brand       string
@@ -77,7 +70,7 @@ func QueryGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
 // insert data to galgamebrand
 func CreateGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
 	// load client data
-	var clientData BrandRecordForClient
+	var clientData dto.SelfBrandUpdateRequest
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err)
 		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, err.Error(), nil)
@@ -112,7 +105,7 @@ func CreateGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
 // update single galgamebrand data
 func UpdateGalgameBrand(c *fiber.Ctx, db *gorm.DB) error {
 	// load client data
-	var clientData BrandRecordForClient
+	var clientData dto.SelfBrandUpdateRequest
 	if err := c.BodyParser(&clientData); err != nil {
 		logrus.Error(err)
 		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, err.Error(), nil)
