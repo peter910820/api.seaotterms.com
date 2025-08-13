@@ -30,6 +30,19 @@ type apiAccount struct {
 	Email    string
 }
 
+func QueryUser(c *fiber.Ctx, db *gorm.DB) error {
+	var data []dto.UserQueryResponse
+	err := db.Table("users").Order("COALESCE(updated_at, created_at) DESC").Find(&data).Error
+	if err != nil {
+		logrus.Error(err)
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, err.Error(), nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+
+	response := utils.ResponseFactory(c, fiber.StatusOK, "使用者查詢成功", &data)
+	return c.Status(fiber.StatusOK).JSON(response)
+}
+
 func CreateUser(c *fiber.Ctx, db *gorm.DB) error {
 	var data dto.RegisterRequest
 	var find []apiAccount

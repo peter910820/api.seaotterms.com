@@ -12,6 +12,10 @@ import (
 func userRouter(blogGroup fiber.Router, dbs map[string]*gorm.DB, dbName string, store *session.Store) {
 	userGroup := blogGroup.Group("/users")
 
+	userGroup.Get("/", middleware.CheckManagement(store), func(c *fiber.Ctx) error {
+		return api.QueryUser(c, dbs[dbName])
+	})
+
 	userGroup.Post("/", func(c *fiber.Ctx) error {
 		return api.CreateUser(c, dbs[dbName])
 	})
