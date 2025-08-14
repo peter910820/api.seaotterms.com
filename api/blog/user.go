@@ -22,6 +22,7 @@ import (
 type UserDataForUpdate struct {
 	UpdatedAt  time.Time
 	UpdateName string
+	Management bool
 	Avatar     string
 }
 
@@ -125,10 +126,11 @@ func UpdateUser(c *fiber.Ctx, db *gorm.DB, store *session.Store) error {
 	}
 	timeNow := time.Now()
 	err = db.Model(&model.User{}).Where("id = ?", id).
-		Select("updated_at", "update_name", "avatar").
+		Select("updated_at", "update_name", "management", "avatar").
 		Updates(UserDataForUpdate{
 			UpdatedAt:  timeNow,
 			UpdateName: clientData.Username,
+			Management: clientData.Management,
 			Avatar:     clientData.Avatar,
 		}).Error
 	if err != nil {
@@ -143,29 +145,40 @@ func UpdateUser(c *fiber.Ctx, db *gorm.DB, store *session.Store) error {
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
 		}
 	}
+
+	userInfo, ok := c.Locals("user_info").(*dto.UserInfo)
+	if !ok {
+		logrus.Error("Middleware異常")
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, "Middleware異常", nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+	// 有可能更新的是別人的資料，所以這邊要判斷是更新誰的，更新別人的就不更新快取表
+	if userInfo.ID != clientData.ID {
+		userInfoCache, ok := middleware.UserInfo[clientData.ID]
+		// 該使用者可能沒有登入，有登入就會有快取表，更新快取表
+		if ok {
+			userInfoCache.UpdatedAt = timeNow
+			userInfoCache.UpdateName = clientData.Username
+			userInfoCache.Management = clientData.Management
+			userInfoCache.Avatar = clientData.Avatar
+			userInfoCache.DataVersion++
+		}
+		return QueryUser(c, db) // 直接重查(偷懶)
+	}
+
 	// 更新使用者資料成功，更新快取表
-	userInfo, ok := middleware.UserInfo[clientData.ID]
+	userInfoCache, ok := middleware.UserInfo[clientData.ID]
 	if !ok {
 		logrus.Error("快取表更新失敗")
 		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, "快取表更新失敗", nil)
 		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
-	userInfo.UpdatedAt = timeNow
-	userInfo.UpdateName = clientData.Username
-	userInfo.Avatar = clientData.Avatar
-	userInfo.DataVersion++
+	userInfoCache.UpdatedAt = timeNow
+	userInfoCache.UpdateName = clientData.Username
+	userInfoCache.Avatar = clientData.Avatar
+	userInfoCache.DataVersion++
 
-	// 更新response UserInfo
-	sess, err := store.Get(c)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	userID := sess.Get("id")
-	if userID == nil {
-		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, "上下文資料更新失敗", nil)
-		return c.Status(fiber.StatusInternalServerError).JSON(response)
-	}
-	c.Locals("user_info", userInfo)
+	c.Locals("user_info", userInfoCache)
 
 	logrus.Infof("個人資料 %s 更新成功", clientData.Username)
 	response := utils.ResponseFactory[any](c, fiber.StatusOK, fmt.Sprintf("資料 %s 更新成功", clientData.Username), nil)
