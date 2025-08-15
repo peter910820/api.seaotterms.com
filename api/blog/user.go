@@ -124,6 +124,20 @@ func UpdateUser(c *fiber.Ctx, db *gorm.DB, store *session.Store) error {
 		response := utils.ResponseFactory[any](c, fiber.StatusBadRequest, "ID比對失敗", nil)
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
+
+	userInfo, ok := c.Locals("user_info").(*dto.UserInfo)
+	if !ok {
+		logrus.Error("Middleware異常")
+		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, "Middleware異常", nil)
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+	// 如果要更新root，但使用者並不是root，就阻擋更新
+	if clientData.Username == "root" && userInfo.Username != "root" {
+		logrus.Error("不允許更新root使用者")
+		response := utils.ResponseFactory[any](c, fiber.StatusForbidden, "不允許更新root使用者", nil)
+		return c.Status(fiber.StatusForbidden).JSON(response)
+	}
+
 	timeNow := time.Now()
 	err = db.Model(&model.User{}).Where("id = ?", id).
 		Select("updated_at", "update_name", "management", "avatar").
@@ -146,12 +160,6 @@ func UpdateUser(c *fiber.Ctx, db *gorm.DB, store *session.Store) error {
 		}
 	}
 
-	userInfo, ok := c.Locals("user_info").(*dto.UserInfo)
-	if !ok {
-		logrus.Error("Middleware異常")
-		response := utils.ResponseFactory[any](c, fiber.StatusInternalServerError, "Middleware異常", nil)
-		return c.Status(fiber.StatusInternalServerError).JSON(response)
-	}
 	// 有可能更新的是別人的資料，所以這邊要判斷是更新誰的，更新別人的就不更新快取表
 	if userInfo.ID != clientData.ID {
 		userInfoCache, ok := middleware.UserInfo[clientData.ID]
