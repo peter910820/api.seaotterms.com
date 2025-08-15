@@ -139,14 +139,23 @@ func UpdateUser(c *fiber.Ctx, db *gorm.DB, store *session.Store) error {
 	}
 
 	timeNow := time.Now()
-	err = db.Model(&model.User{}).Where("id = ?", id).
-		Select("updated_at", "update_name", "management", "avatar").
-		Updates(UserDataForUpdate{
-			UpdatedAt:  timeNow,
-			UpdateName: clientData.Username,
-			Management: clientData.Management,
-			Avatar:     clientData.Avatar,
-		}).Error
+	if uint(u) == userInfo.ID {
+		err = db.Model(&model.User{}).Where("id = ?", u).
+			Select("updated_at", "update_name", "avatar").
+			Updates(UserDataForUpdate{
+				UpdatedAt:  timeNow,
+				UpdateName: clientData.Username,
+				Avatar:     clientData.Avatar,
+			}).Error
+	} else {
+		err = db.Model(&model.User{}).Where("id = ?", u).
+			Select("updated_at", "update_name", "management").
+			Updates(UserDataForUpdate{
+				UpdatedAt:  timeNow,
+				UpdateName: clientData.Username,
+				Management: clientData.Management,
+			}).Error
+	}
 	if err != nil {
 		// if record not exist
 		if err == gorm.ErrRecordNotFound {
@@ -168,7 +177,6 @@ func UpdateUser(c *fiber.Ctx, db *gorm.DB, store *session.Store) error {
 			userInfoCache.UpdatedAt = timeNow
 			userInfoCache.UpdateName = clientData.Username
 			userInfoCache.Management = clientData.Management
-			userInfoCache.Avatar = clientData.Avatar
 			userInfoCache.DataVersion++
 		}
 		return QueryUser(c, db) // 直接重查(偷懶)
