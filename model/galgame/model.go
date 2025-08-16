@@ -54,7 +54,6 @@ type PlayRecord struct {
 	OpDisplayScore       *float64  `json:"opDisplayScore"`       // OP畫面分數，可能沒有值
 	OpSongScore          *float64  `json:"opSongScore"`          // OP歌曲分數，可能沒有值
 	OpCompatibilityScore *float64  `json:"opCompatibilityScore"` // OP畫面契合度分數，可能沒有值
-	EdDisplayScore       *float64  `json:"edDisplayScore"`
 	EdSongScore          *float64  `json:"edSongScore"`
 	MusicScore           *float64  `json:"musicScore"`
 	PlotScore            float64   `json:"plotScore"`
@@ -99,7 +98,6 @@ type SelfGame struct {
 	OpDisplayScore       *int   `json:"opDisplayScore"`                             // OP畫面分數，可能沒有值
 	OpSongScore          *int   `json:"opSongScore"`                                // OP歌曲分數，可能沒有值
 	OpCompatibilityScore *int   `json:"opCompatibilityScore"`                       // OP畫面契合度分數，可能沒有值
-	EdDisplayScore       *int   `json:"edDisplayScore"`                             // ED畫面分數，可能沒有值
 	EdSongScore          *int   `json:"edSongScore"`                                // ED歌曲分數，可能沒有值
 	MusicScore           *int   `json:"musicScore"`                                 // 音樂分數，可能沒有值(早期遊戲沒有紀錄)
 	PlotScore            int    `gorm:"NOT NULL; default:0" json:"plotScore"`       // 劇情分數
