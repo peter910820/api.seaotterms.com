@@ -96,20 +96,20 @@ type SelfGame struct {
 	UpdateTime  time.Time `gorm:"autoUpdateTime" json:"updateTime"` // UpdateTime
 	UpdateName  string    `gorm:"not null" json:"updateName"`       // UpdateName
 	// 2025-08-16
-	OpDisplayScore       *float64 `json:"opDisplayScore"`                             // OP畫面分數，可能沒有值
-	OpSongScore          *float64 `json:"opSongScore"`                                // OP歌曲分數，可能沒有值
-	OpCompatibilityScore *float64 `json:"opCompatibilityScore"`                       // OP畫面契合度分數，可能沒有值
-	EdDisplayScore       *float64 `json:"edDisplayScore"`                             // ED畫面分數，可能沒有值
-	EdSongScore          *float64 `json:"edSongScore"`                                // ED歌曲分數，可能沒有值
-	MusicScore           *float64 `json:"musicScore"`                                 // 音樂分數，可能沒有值(早期遊戲沒有紀錄)
-	PlotScore            float64  `gorm:"NOT NULL; default:0" json:"plotScore"`       // 劇情分數
-	ArtScore             float64  `gorm:"NOT NULL; default:0" json:"artScore"`        // 美術分數
-	SystemScore          float64  `gorm:"NOT NULL; default:0" json:"systemScore"`     // 系統分數
-	ThemeScore           float64  `gorm:"NOT NULL; default:0" json:"themeScore"`      // 題材分數
-	ConclusionScore      float64  `gorm:"NOT NULL; default:0" json:"conclusionScore"` // 收尾分數
-	Category             string   `gorm:"NOT NULL; default:一般" json:"category"`       // 遊戲類型
-	Recommended          int      `gorm:"NOT NULL; default:0" json:"recommended"`     // 私心推薦程度 1到4分別對應不推、普、推、大推(0為未設定)
-	Experience           string   `json:"experience"`                                 // 心得
+	OpDisplayScore       *int   `json:"opDisplayScore"`                             // OP畫面分數，可能沒有值
+	OpSongScore          *int   `json:"opSongScore"`                                // OP歌曲分數，可能沒有值
+	OpCompatibilityScore *int   `json:"opCompatibilityScore"`                       // OP畫面契合度分數，可能沒有值
+	EdDisplayScore       *int   `json:"edDisplayScore"`                             // ED畫面分數，可能沒有值
+	EdSongScore          *int   `json:"edSongScore"`                                // ED歌曲分數，可能沒有值
+	MusicScore           *int   `json:"musicScore"`                                 // 音樂分數，可能沒有值(早期遊戲沒有紀錄)
+	PlotScore            int    `gorm:"NOT NULL; default:0" json:"plotScore"`       // 劇情分數
+	ArtScore             int    `gorm:"NOT NULL; default:0" json:"artScore"`        // 美術分數
+	SystemScore          int    `gorm:"NOT NULL; default:0" json:"systemScore"`     // 系統分數
+	ThemeScore           int    `gorm:"NOT NULL; default:0" json:"themeScore"`      // 題材分數
+	ConclusionScore      int    `gorm:"NOT NULL; default:0" json:"conclusionScore"` // 收尾分數
+	Category             string `gorm:"NOT NULL; default:一般" json:"category"`       // 遊戲類型
+	Recommended          int    `gorm:"NOT NULL; default:0" json:"recommended"`     // 私心推薦程度 1到4分別對應不推、普、推、大推(0為未設定)
+	Experience           string `json:"experience"`                                 // 心得
 }
 
 type User struct {
