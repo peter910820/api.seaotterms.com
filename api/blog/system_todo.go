@@ -2,6 +2,7 @@ package blog
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -17,16 +18,26 @@ func QuerySystemTodo(c *fiber.Ctx, db *gorm.DB) error {
 	// get query param
 	id := c.Query("id")
 	systemName := c.Query("system_name")
+	statusStr := c.Query("status")
+	status, err := strconv.Atoi(statusStr)
+	if err != nil {
+		status = 999
+	}
 
 	var data []model.SystemTodo
-	var err error
-	if id == "" && systemName == "" {
+	if id == "" && systemName == "" && status == 999 {
 		err = db.Order("COALESCE(updated_at, created_at) DESC").Find(&data).Error
 	} else {
 		if id != "" {
 			err = db.Where("id = ?", id).Order("COALESCE(updated_at, created_at) DESC").Find(&data).Error
 		} else {
-			err = db.Where("system_name = ?", systemName).Order("COALESCE(updated_at, created_at) DESC").Find(&data).Error
+			if systemName != "" {
+				db = db.Where("system_name = ?", systemName)
+			}
+			if status != 999 {
+				db = db.Where("status = ?", status)
+			}
+			err = db.Order("COALESCE(updated_at, created_at) DESC").Find(&data).Error
 		}
 	}
 	if err != nil {
